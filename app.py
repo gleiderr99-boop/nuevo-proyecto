@@ -31,28 +31,34 @@ with app.app_context():
 
 # --- RUTAS ---
 
-@app.route('/')
-def inicio():
-    # Página principal de bienvenida
-    return render_template('inicio.html')
-
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        # Encriptamos la clave por seguridad
+        correo_ingresado = request.form['correo']
+        # Encriptamos la contraseña por seguridad
         pw_hash = generate_password_hash(request.form['pass'], method='pbkdf2:sha256')
+        
+        # --- CONFIGURACIÓN DE ADMINISTRADOR ---
+        # Si te registras con este correo, tendrás todos los permisos
+        soy_el_jefe = False
+        if correo_ingresado.lower() == 'gleidertatiana0@gmail.com': 
+            soy_el_jefe = True
+        
         nuevo_usuario = User(
             nombre=request.form['nombre'],
-            correo=request.form['correo'],
+            correo=correo_ingresado,
             password=pw_hash,
-            es_admin=False
+            es_admin=soy_el_jefe # Si es tu correo, es_admin será True
         )
+        # ---------------------------------------
+        
         try:
             db.session.add(nuevo_usuario)
             db.session.commit()
             return redirect(url_for('login'))
         except:
-            return "El correo ya está registrado. <a href='/registro'>Intenta otro</a>"
+            return "Error: Este correo ya está registrado en la base de datos. <a href='/login'>Inicia sesión aquí</a>"
+            
     return render_template('registro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
