@@ -90,24 +90,26 @@ def catalogo():
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
     if not session.get('es_admin'):
-        return "Acceso denegado. <a href='/'>Ir al inicio</a>"
+        return redirect(url_for('login'))
     
     if request.method == 'POST':
-        nombre = request.form['nombre']
-        precio = request.form['precio']
-        desc = request.form['descripcion']
-        file = request.files['foto']
+        nombre = request.form.get('nombre')
+        precio = request.form.get('precio')
+        desc = request.form.get('descripcion')
+        file = request.files.get('foto')
         
-        if file:
+        if nombre and precio and file:
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            nuevo_p = Producto(nombre=nombre, precio=precio, imagen=filename, descripcion=desc)
+            nuevo_p = Producto(nombre=nombre, precio=float(precio), imagen=filename, descripcion=desc)
             db.session.add(nuevo_p)
             db.session.commit()
             return redirect(url_for('gleider_admin'))
 
+    # AQUÍ ESTÁ EL CAMBIO: Traemos productos Y usuarios
     productos = Producto.query.all()
-    return render_template('admin.html', productos=productos)
+    usuarios = User.query.all() 
+    return render_template('admin.html', productos=productos, usuarios=usuarios)
 
 @app.route('/logout')
 def logout():
