@@ -1,75 +1,87 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-
-# Configuración
-app.secret_key = 'mi_llave_secreta_pro' 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.secret_key = 'gleider_shop_ultra_secret'
+app.config['      SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 db = SQLAlchemy(app)
 
-# Modelo de la Base de Datos
+# MODELOS
+class User(db.Model):
+    id = db.挑战 = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100))
+    correo = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(200))
+    es_admin = db.Column(db.Boolean, default=False)
+
 class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    precio = db.Column(db.String(20), nullable=False)
-    imagen = db.Column(db.String(200), nullable=False)
+    nombre = db.Column(db.String(100))
+    precio = db.Column(db.Float)
+    imagen = db.Column(db.String(200))
+    descripcion = db.Column(db.Text)
 
-# Crear base de datos
 with app.app_context():
     db.create_all()
 
-# --- 1. RUTA DE INICIO: AHORA ES EL LOGIN ---
-@app.route('/', methods=['GET', 'POST'])
+# --- RUTAS ---
+
+@app.route('/')
+def inicio():
+    # Página de bienvenida con info importante
+    return render_template('inicio.html')
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        hash_pw = generate_password_hash(request.form['pass'], method='pbkdf2:sha256')
+        nuevo_usuario = User(
+            nombre=request.form['nombre'],
+            correo=request.form['correo'],
+            password=hash_pw,
+            es_admin=False # Por defecto son clientes
+        )
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('registro.html')
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Usuario: admin | Clave: 1234
-        if request.form['user'] == 'admin' and request.form['pass'] == 'gleider1':
-            session['admin'] = True
-            return redirect(url_for('admin'))
-        else:
-            return "Error: Usuario o contraseña incorrectos. <a href='/'>Volver</a>"
+        user = User.query.filter_by(correo=request.form['correo']).first()
+        if user and check_password_hash(user.password, request.form['pass']):
+            session['user_id'] = user.id
+            session['es_admin'] = user.es_admin
+            return redirect(url_for('catalogo'))
+        return "Credenciales incorrectas"
     return render_template('login.html')
 
-# --- 2. RUTA DEL CATÁLOGO (LO QUE VEN LOS CLIENTES) ---
 @app.route('/catalogo')
-def index():
+def catalogo():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     productos = Producto.query.all()
     return render_template('index.html', productos=productos)
 
-# --- 3. PANEL DE ADMINISTRACIÓN ---
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    if 'admin' not in session:
-        return redirect(url_for('login'))
+@app.route('/gleider_admin', methods=['GET', 'POST'])
+def gleider_admin():
+    if not session.get('es_admin'):
+        return "Acceso denegado. Solo Gleider puede entrar aquí."
     
     if request.method == 'POST':
-        nombre = request.form['nombre']
-        precio = request.form['precio']
-        foto = request.files['foto']
-        
-        if foto:
-            nombre_archivo = foto.filename
-            # Guardamos la foto en static/uploads
-            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo))
-            
-            nuevo_p = Producto(nombre=nombre, precio=precio, imagen=nombre_archivo)
-            db.session.add(nuevo_p)
-            db.session.commit()
-            return redirect(url_for('admin'))
-            
+        # Código para subir producto (nombre, precio, descripcion, foto)
+        # ... (aquí va tu lógica de guardado anterior) ...
+        pass
+    
     productos = Producto.query.all()
     return render_template('admin.html', productos=productos)
 
-# --- 4. CERRAR SESIÓN ---
 @app.route('/logout')
 def logout():
-    session.pop('admin', None)
-    return redirect(url_for('login'))
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    session.clear()
+    return redirect(url_for('inicio'))
