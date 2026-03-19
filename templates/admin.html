@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background: #f4f4f4; color: #333;">
+    <div style="max-width: 600px; margin: 50px auto; background: white; padding: 20px; border-radius: 10px;">
+        <h2>Panel de Administrador</h2>
+        <hr>
+        
+        <h3>Subir Nuevo Producto</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="text" name="nombre" placeholder="Nombre del producto" required style="width: 100%; margin-bottom: 10px; padding: 10px;">
+            <input type="text" name="precio" placeholder="Precio (ej: 25.00)" required style="width: 100%; margin-bottom: 10px; padding: 10px;">
+            <input type="file" name="foto" accept="image/*" required style="margin-bottom: 10px;">
+            <button type="submit" style="background: #2563eb; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">
+                Publicar Producto
+            </button>
+        </form>
+
+        <hr>
+        <h3>Productos Actuales</h3>
+        <ul>
+            {% for p in productos %}
+            <li>{{ p.nombre }} - ${{ p.precio }}</li>
+            {% endfor %}
+        </ul>
+        <a href="/logout">Cerrar Sesión</a>
+    </div>
+</body>
+</html>
