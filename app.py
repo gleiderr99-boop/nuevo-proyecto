@@ -41,7 +41,7 @@ def registro():
         # --- CONFIGURACIÓN DE ADMINISTRADOR ---
         # Si te registras con este correo, tendrás todos los permisos
         soy_el_jefe = False
-        if correo_ingresado.lower() == 'gleidertatiana0@gmail.com': 
+        if correo_ingresado.lower() == 'gleiderr99@gmail.com': 
             soy_el_jefe = True
         
         nuevo_usuario = User(
