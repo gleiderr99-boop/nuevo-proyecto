@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta_gleider' # Cambia esto por algo difícil
+app.secret_key = 'clave_secreta_gleider' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
@@ -25,22 +25,24 @@ class Producto(db.Model):
     imagen = db.Column(db.String(200))
     descripcion = db.Column(db.Text)
 
-# Crear las tablas
 with app.app_context():
     db.create_all()
 
 # --- RUTAS ---
 
+# ESTA ES LA QUE FALTABA (La puerta de entrada)
+@app.route('/')
+def inicio():
+    return render_template('inicio.html')
+
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
         correo_ingresado = request.form['correo']
-        # Encriptamos la contraseña por seguridad
         pw_hash = generate_password_hash(request.form['pass'], method='pbkdf2:sha256')
         
-        # --- CONFIGURACIÓN DE ADMINISTRADOR ---
-        # Si te registras con este correo, tendrás todos los permisos
         soy_el_jefe = False
+        # Asegúrate de que este sea el correo exacto que usarás
         if correo_ingresado.lower() == 'gleiderr99@gmail.com': 
             soy_el_jefe = True
         
@@ -48,16 +50,15 @@ def registro():
             nombre=request.form['nombre'],
             correo=correo_ingresado,
             password=pw_hash,
-            es_admin=soy_el_jefe # Si es tu correo, es_admin será True
+            es_admin=soy_el_jefe 
         )
-        # ---------------------------------------
         
         try:
             db.session.add(nuevo_usuario)
             db.session.commit()
             return redirect(url_for('login'))
         except:
-            return "Error: Este correo ya está registrado en la base de datos. <a href='/login'>Inicia sesión aquí</a>"
+            return "Error: Este correo ya existe. <a href='/login'>Inicia sesión</a>"
             
     return render_template('registro.html')
 
@@ -82,14 +83,12 @@ def login():
 
 @app.route('/catalogo')
 def catalogo():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
+    # Quitamos el bloqueo para que sea público
     productos = Producto.query.all()
     return render_template('index.html', productos=productos)
 
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
-    # Seguridad: Solo entra si es admin
     if not session.get('es_admin'):
         return "Acceso denegado. <a href='/'>Ir al inicio</a>"
     
