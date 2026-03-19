@@ -65,4 +65,4 @@ def admin():
             return redirect(url_for('admin'))
             
     productos = Producto.query.all()
-    return render_template('admin.html
+   return render_template('admin.html', productos=productos)
