@@ -115,6 +115,24 @@ def gleider_admin():
 def logout():
     session.clear()
     return redirect(url_for('inicio'))
-
+    
+@app.route('/eliminar_producto/<int:id>')
+def eliminar_producto(id):
+    # Seguridad: Solo el admin puede borrar
+    if not session.get('es_admin'):
+        return redirect(url_for('login'))
+    
+    producto = Producto.query.get(id)
+    if producto:
+        # Opcional: Borrar el archivo físico de la carpeta uploads
+        try:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], producto.imagen))
+        except:
+            pass # Si no encuentra la foto, que siga adelante
+            
+        db.session.delete(producto)
+        db.session.commit()
+    
+    return redirect(url_for('gleider_admin'))
 if __name__ == '__main__':
     app.run(debug=True)
