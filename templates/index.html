@@ -3,74 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabanalarga Ventas | Gleider Shop</title>
+    <title>Sabanalarga Market | Gleider Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc; }
+        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f1f5f9; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; }
-        nav { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px 5%; }
-        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .card img { width: 100%; height: 250px; object-fit: cover; }
+        
+        /* Navegación */
+        nav { 
+            background: white; padding: 15px 5%; display: flex; 
+            justify-content: space-between; align-items: center; 
+            sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .logo { font-weight: 600; color: var(--primary); font-size: 1.4rem; text-decoration: none; }
+        .nav-btns a { text-decoration: none; color: var(--dark); font-weight: 500; margin-left: 15px; }
+
+        /* Banner de Bienvenida */
+        .hero { 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80');
+            background-size: cover; background-position: center;
+            height: 250px; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; color: white; text-align: center;
+        }
+
+        /* Cuadrícula de Productos */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; padding: 40px 5%; 
+        }
+        
+        .card { 
+            background: white; border-radius: 20px; overflow: hidden; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 230px; object-fit: cover; }
+        
         .info { padding: 20px; }
-        .price { font-size: 1.5rem; color: var(--primary); font-weight: 600; }
-        .vendedor-tag { font-size: 0.8rem; color: #64748b; background: #e2e8f0; padding: 3px 10px; border-radius: 50px; }
-        .btn-wa { background: #25d366; color: white; display: block; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; margin-top: 10px; }
-        .comments-section { background: #f1f5f9; padding: 15px; border-top: 1px solid #e2e8f0; }
-        .comment-item { font-size: 0.85rem; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; box-sizing: border-box; }
-        .footer-vendedores { background: var(--dark); color: white; padding: 40px; text-align: center; margin-top: 40px; }
+        .info h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--dark); }
+        .price { font-size: 1.3rem; color: var(--primary); font-weight: 600; display: block; margin-bottom: 10px; }
+        .vendedor-tag { font-size: 0.75rem; color: #64748b; margin-bottom: 15px; display: block; }
+
+        /* Estilo del Chat en el Index */
+        .chat-form { border-top: 1px solid #f1f5f9; padding-top: 15px; margin-top: 15px; }
+        .chat-form input { 
+            width: 100%; padding: 10px; border: 1px solid #e2e8f0; 
+            border-radius: 8px; margin-bottom: 8px; box-sizing: border-box;
+        }
+        .btn-chat { 
+            background: var(--primary); color: white; border: none; 
+            width: 100%; padding: 10px; border-radius: 8px; 
+            font-weight: 600; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; gap: 8px;
+        }
+        
+        .btn-login-to-chat {
+            display: block; text-align: center; background: #e2e8f0; 
+            color: #475569; padding: 10px; border-radius: 8px; 
+            text-decoration: none; font-size: 0.85rem; font-weight: 600;
+        }
+
+        /* Footer */
+        .footer { background: var(--dark); color: white; padding: 40px 5%; text-align: center; }
+        .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
 <nav>
-    <h2 style="margin:0; color:var(--primary)">Sabanalarga Market</h2>
-    {% if session['user_name'] %}
-        <a href="/gleider_admin" style="text-decoration:none; color:var(--primary); font-weight:600">Mi Panel</a>
-    {% else %}
-        <a href="/login" style="text-decoration:none; color:var(--primary)">Vendedores</a>
-    {% endif %}
+    <a href="/" class="logo">Sabanalarga Market</a>
+    <div class="nav-btns">
+        {% if session['user_name'] %}
+            <a href="/gleider_admin">Hola, {{ session['user_name'] }} <i class="fas fa-user-circle"></i></a>
+        {% else %}
+            <a href="/login">Iniciar Sesión</a>
+            <a href="/registro" style="background: var(--primary); color: white; padding: 8px 15px; border-radius: 8px;">Vender</a>
+        {% endif %}
+    </div>
 </nav>
+
+<div class="hero">
+    <h1>Lo mejor de Sabanalarga en un solo lugar</h1>
+    <p>Apoya el comercio local de nuestro pueblo</p>
+</div>
 
 <div class="grid">
     {% for p in productos %}
     <div class="card">
-        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" onerror="this.src='https://via.placeholder.com/300x200?text=Sin+Imagen'">
         <div class="info">
             <span class="vendedor-tag"><i class="fas fa-store"></i> {{ p.vendedor.nombre }}</span>
-            <h3 style="margin:10px 0">{{ p.nombre }}</h3>
-            <p style="font-size:0.9rem; color:#475569">{{ p.descripcion }}</p>
+            <h3>{{ p.nombre }}</h3>
             <span class="price">${{ "{:,.0f}".format(p.precio) }}</span>
-            
-            <a href="https://wa.me/57{{ p.vendedor.telefono }}?text=Hola%20{{ p.vendedor.nombre }},%20vi%20tu%20producto%20{{ p.nombre }}%20en%20GleiderShop" class="btn-wa">
-                <i class="fab fa-whatsapp"></i> Preguntar al Vendedor
-            </a>
-        </div>
+            <p style="font-size: 0.85rem; color: #64748b; line-height: 1.4;">{{ p.descripcion }}</p>
 
-        <div class="comments-section">
-            <h4 style="margin:0 0 10px 0; font-size:0.9rem">Preguntas:</h4>
-            {% for c in p.comentarios %}
-                <div class="comment-item"><strong>{{ c.cliente }}:</strong> {{ c.contenido }}</div>
-            {% endfor %}
-            <form action="/comentar/{{ p.id }}" method="POST" style="margin-top:10px">
-                <input type="text" name="nombre_cliente" placeholder="Tu nombre" required>
-                <input type="text" name="comentario" placeholder="Escribe tu duda..." required>
-                <button type="submit" style="margin-top:5px; width:100%; padding:5px; border-radius:5px; border:none; background:var(--primary); color:white; cursor:pointer">Enviar duda</button>
-            </form>
+            <div class="chat-form">
+                {% if session['user_id'] %}
+                    <form action="/enviar_mensaje/{{ p.id }}" method="POST">
+                        <input type="text" name="mensaje" placeholder="Escribe tu duda al vendedor..." required>
+                        <button type="submit" class="btn-chat">
+                            <i class="fas fa-paper-plane"></i> Chatear con Vendedor
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="/login" class="btn-login-to-chat">
+                        <i class="fas fa-lock"></i> Inicia sesión para preguntar
+                    </a>
+                {% endif %}
+            </div>
         </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+        <i class="fas fa-box-open" style="font-size: 3rem; color: #cbd5e1;"></i>
+        <p style="color: #64748b; margin-top: 10px;">Aún no hay productos disponibles. ¡Sé el primero en vender!</p>
     </div>
     {% endfor %}
 </div>
 
-<div class="footer-vendedores">
-    <h3>¿Eres de Sabanalarga y quieres vender?</h3>
-    <p>Sube tus productos aquí y llega a más gente del pueblo.</p>
-    <div style="margin-top:20px">
-        <a href="/registro" style="background:var(--primary); color:white; padding:12px 25px; border-radius:50px; text-decoration:none; margin-right:10px">Crear Cuenta</a>
-        <a href="/login" style="background:white; color:var(--dark); padding:12px 25px; border-radius:50px; text-decoration:none">Entrar</a>
-    </div>
+<div class="footer">
+    <h3>¿Tienes un negocio en Sabanalarga?</h3>
+    <p>Únete a la plataforma y aumenta tus ventas gratis.</p>
+    <a href="/registro">Registrar mi negocio ahora</a>
+    <p style="font-size: 0.7rem; margin-top: 30px; opacity: 0.5;">&copy; 2024 Gleider Shop - Marketplace Local</p>
 </div>
 
 </body>
