@@ -62,4 +62,89 @@
             box-shadow: 0 12px 25px rgba(0,0,0,0.1);
         }
 
-        /* Imagen
+        /* Imagen con efecto */
+        .card-img-container { width: 100%; height: 300px; overflow: hidden; }
+        .card img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: transform 0.5s ease;
+        }
+        .card:hover img { transform: scale(1.1); }
+
+        /* Info del producto */
+        .card-body { padding: 20px; text-align: center; }
+        .card-body h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--dark); }
+        .card-body p { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; height: 40px; overflow: hidden; }
+        
+        /* Precio estilizado */
+        .price { 
+            font-size: 1.4rem; 
+            font-weight: 600; 
+            color: var(--primary); 
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* Botón de WhatsApp Pro */
+        .wa-btn { 
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); 
+            color: white; 
+            padding: 12px; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .wa-btn:hover { filter: brightness(1.1); }
+        .wa-btn i { font-size: 1.2rem; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1>Gleider Shop</h1>
+        <div class="user-info">
+            {% if session['user_name'] %}
+                <span><i class="fas fa-user"></i> {{ session['user_name'] }}</span>
+                <a href="/logout" class="logout-btn">Salir</a>
+            {% else %}
+                <a href="/login" style="text-decoration: none; color: var(--primary); font-weight: 600;">Iniciar Sesión</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h2>Nuestra Colección</h2>
+        <p>Calidad y estilo en cada prenda.</p>
+    </header>
+
+    <div class="grid">
+        {% for p in productos %}
+        <div class="card">
+            <div class="card-img-container">
+                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}">
+            </div>
+            <div class="card-body">
+                <h3>{{ p.nombre }}</h3>
+                <p>{{ p.descripcion }}</p>
+                <span class="price">${{ "{:,.0f}".format(p.precio) }}</span>
+                
+                <a href="https://wa.me/573245181423?text=Hola%20Gleider,%20me%20interesa%20comprar:%20{{ p.nombre }}" class="wa-btn">
+                    <i class="fab fa-whatsapp"></i> Pedir por WhatsApp
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
