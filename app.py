@@ -52,11 +52,21 @@ with app.app_context():
 
 # --- RUTAS DE NAVEGACIÓN Y AUTENTICACIÓN ---
 
+# Reemplaza la ruta de inicio y añade el modelo de mensajes leídos
 @app.route('/')
 def inicio():
-    productos = Producto.query.all()
+    query = request.args.get('q') # Captura lo que la gente escribe en el buscador
+    if query:
+        # Busca productos que contengan esa palabra en el nombre
+        productos = Producto.query.filter(Producto.nombre.contains(query)).all()
+    else:
+        productos = Producto.query.all()
     return render_template('index.html', productos=productos)
 
+# Añade esto a tu clase Mensaje para las notificaciones
+# class Mensaje(db.Model):
+#    ... (lo que ya tenías)
+#    leido = db.Column(db.Boolean, default=False)
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
