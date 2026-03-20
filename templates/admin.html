@@ -66,16 +66,20 @@
 
         <div class="glass-card" id="mensajes">
             <h3><i class="fas fa-envelope"></i> Mensajes de Clientes</h3>
-            {% if mensajes %}
-                {% for m in mensajes %}
-                <a href="/chat/{{ m.emisor_id }}" class="msg-item">
-                    <div>
-                        <strong>{{ m.emisor.nombre }}</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #64748b;">{{ m.contenido[:50] }}...</p>
-                    </div>
-                    <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
-                </a>
-                {% endfor %}
+            {% for m in mensajes %}
+<a href="/chat/{{ m.emisor_id }}" class="msg-item" style="display: flex; justify-content: space-between; align-items: center; position: relative;">
+    <div>
+        <strong>{{ m.emisor.nombre }}</strong>
+        <p style="margin: 0; font-size: 0.8rem; color: #64748b;">{{ m.contenido[:30] }}...</p>
+    </div>
+    
+    {% if not m.leido %}
+        <span style="background: #ef4444; width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 10px;"></span>
+    {% endif %}
+    
+    <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+</a>
+{% endfor %}
             {% else %}
                 <p style="color: #94a3b8; text-align: center;">No tienes mensajes nuevos todavía.</p>
             {% endif %}
