@@ -209,7 +209,20 @@ def chat(user_b):
     
     otro_usuario = User.query.get(user_b)
     return render_template('chat.html', mensajes=mensajes, otro=otro_usuario)
-
+    
+ @app.route('/recuperar', methods=['GET', 'POST'])
+ def recuperar():
+    if request.method == 'POST':
+        correo = request.form['correo']
+        nueva_pass = request.form['nueva_pass']
+        user = User.query.filter_by(correo=correo).first()
+        if user:
+            from hash src import generate_password_hash # Asegúrate de tener esta importación arriba
+            user.password = generate_password_hash(nueva_pass, method='pbkdf2:sha256')
+            db.session.commit()
+            return "Contraseña actualizada con éxito. <a href='/login'>Inicia sesión aquí</a>"
+        return "El correo no está registrado. <a href='/registro'>Crea una cuenta</a>"
+    return render_template('recuperar.html')
 if __name__ == '__main__':
     # Render asigna un puerto automáticamente, por eso usamos os.environ.get
     port = int(os.environ.get("PORT", 5000))
