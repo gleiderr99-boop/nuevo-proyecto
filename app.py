@@ -207,7 +207,44 @@ def eliminar_producto(id):
 def logout():
     session.clear()
     return redirect(url_for('inicio'))
+@app.route('/perfil/<int:user_id>')
+def perfil(user_id):
+    usuario = User.query.get_or_404(user_id)
+    # Sacamos sus productos para que el cliente vea qué más vende
+    productos_vendedor = Producto.query.filter_by(user_id=user_id).all()
+    return render_template('perfil.html', usuario=usuario, productos=productos_vendedor)
 
+# Modificamos la ruta gleider_admin para que los clientes vean sus mensajes enviados
+@app.route('/gleider_admin', methods=['GET', 'POST'])
+def gleider_admin():
+    if 'user_id' not in session: return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    
+    if request.method == 'POST' and user.telefono != "Cliente":
+        # ... (aquí va el código de subir producto que ya tienes)
+        pass
+
+    # Lógica de mensajes mejorada:
+    # Si soy vendedor, veo los que RECIBÍ. Si soy cliente, veo con quién he CHATEADO.
+    if user.telefono == "Cliente":
+        # Mensajes donde el cliente es emisor o receptor
+        mensajes = Mensaje.query.filter((Mensaje.emisor_id == user.id) | (Mensaje.receptor_id == user.id)).order_by(Mensaje.fecha.desc()).all()
+    else:
+        mensajes = Mensaje.query.filter_by(receptor_id=user.id).order_by(Mensaje.fecha.desc()).all()
+
+    # Evitar duplicados en la lista de chats
+    chats_vistos = []
+    mensajes_unicos = []
+    for m in mensajes:
+        otro_id = m.emisor_id if m.emisor_id != user.id else m.receptor_id
+        if otro_id not in chats_vistos:
+            mensajes_unicos.append(m)
+            chats_vistos.append(otro_id)
+
+    productos = Producto.query.filter_by(user_id=user.id).all()
+    usuarios = User.query.all() if user.es_admin else []
+    
+    return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos, usuarios=usuarios)
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
