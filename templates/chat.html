@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con {{ otro.nombre }} | Sabanalarga Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2563eb; --bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+
+        /* Cabecera del Chat */
+        .chat-header { background: var(--primary); color: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .chat-header a { color: white; text-decoration: none; font-size: 1.2rem; }
+        .user-info h2 { margin: 0; font-size: 1rem; }
+        .user-info p { margin: 0; font-size: 0.75rem; opacity: 0.8; }
+
+        /* Área de Mensajes */
+        .messages-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .bubble { max-width: 75%; padding: 10px 15px; border-radius: 18px; font-size: 0.9rem; line-height: 1.4; position: relative; word-wrap: break-word; }
+        
+        /* Mis mensajes (Enviados) */
+        .sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        
+        /* Mensajes del otro (Recibidos) */
+        .received { align-self: flex-start; background: var(--white); color: #1e293b; border-bottom-left-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .time { font-size: 0.65rem; display: block; margin-top: 5px; opacity: 0.7; text-align: right; }
+
+        /* Barra de Entrada de Texto */
+        .chat-input-area { background: var(--white); padding: 15px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #e2e8f0; }
+        .chat-input-area input { flex: 1; padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 30px; outline: none; font-family: inherit; font-size: 0.9rem; }
+        .chat-input-area button { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .chat-input-area button:hover { transform: scale(1.1); }
+
+        /* Empty state */
+        .no-messages { text-align: center; color: #94a3b8; margin-top: 50px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-header">
+        <a href="/gleider_admin"><i class="fas fa-arrow-left"></i></a>
+        <div class="user-info">
+            <h2>{{ otro.nombre }}</h2>
+            <p><i class="fas fa-circle" style="color: #22c55e; font-size: 8px;"></i> Vendedor verificado</p>
+        </div>
+    </div>
+
+    <div class="messages-container" id="chatBox">
+        {% if not mensajes %}
+            <div class="no-messages">
+                <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 10px; display: block;"></i>
+                Inicia la conversación preguntando por el producto.
+            </div>
+        {% endif %}
+
+        {% for m in mensajes %}
+            <div class="bubble {{ 'sent' if m.emisor_id == session['user_id'] else 'received' }}">
+                {{ m.contenido }}
+                <span class="time">{{ m.fecha.strftime('%H:%M') }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <form class="chat-input-area" action="/enviar_mensaje/{{ mensajes[0].producto_id if mensajes else 1 }}" method="POST">
+        <input type="text" name="mensaje" placeholder="Escribe un mensaje..." required autocomplete="off">
+        <button type="submit">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </form>
+
+    <script>
+        // Auto-scroll al último mensaje al cargar
+        const chatBox = document.getElementById('chatBox');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    </script>
+
+</body>
+</html>
