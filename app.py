@@ -31,7 +31,6 @@ with app.app_context():
 
 # --- RUTAS ---
 
-# ESTA ES LA QUE FALTABA (La puerta de entrada)
 @app.route('/')
 def inicio():
     return render_template('inicio.html')
@@ -43,7 +42,6 @@ def registro():
         pw_hash = generate_password_hash(request.form['pass'], method='pbkdf2:sha256')
         
         soy_el_jefe = False
-        # Asegúrate de que este sea el correo exacto que usarás
         if correo_ingresado.lower() == 'gleiderr99@gmail.com': 
             soy_el_jefe = True
         
@@ -84,7 +82,6 @@ def login():
 
 @app.route('/catalogo')
 def catalogo():
-    # Quitamos el bloqueo para que sea público
     productos = Producto.query.all()
     return render_template('index.html', productos=productos)
 
@@ -94,20 +91,29 @@ def gleider_admin():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
+        # 1. Recogemos los datos primero
         nombre = request.form.get('nombre')
         precio = request.form.get('precio')
         desc = request.form.get('descripcion')
+        categoria = request.form.get('categoria')
         file = request.files.get('foto')
         
+        # 2. Verificamos y guardamos
         if nombre and precio and file:
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            nuevo_p = Producto(nombre=nombre, precio=float(precio), imagen=filename, descripcion=desc)
+            
+            nuevo_p = Producto(
+                nombre=nombre, 
+                precio=float(precio), 
+                imagen=filename, 
+                descripcion=desc, 
+                categoria=categoria
+            )
             db.session.add(nuevo_p)
             db.session.commit()
             return redirect(url_for('gleider_admin'))
 
-    # AQUÍ ESTÁ EL CAMBIO: Traemos productos Y usuarios
     productos = Producto.query.all()
     usuarios = User.query.all() 
     return render_template('admin.html', productos=productos, usuarios=usuarios)
@@ -119,21 +125,20 @@ def logout():
     
 @app.route('/eliminar_producto/<int:id>')
 def eliminar_producto(id):
-    # Seguridad: Solo el admin puede borrar
     if not session.get('es_admin'):
         return redirect(url_for('login'))
     
     producto = Producto.query.get(id)
     if producto:
-        # Opcional: Borrar el archivo físico de la carpeta uploads
         try:
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], producto.imagen))
         except:
-            pass # Si no encuentra la foto, que siga adelante
+            pass 
             
         db.session.delete(producto)
         db.session.commit()
     
     return redirect(url_for('gleider_admin'))
+
 if __name__ == '__main__':
     app.run(debug=True)
