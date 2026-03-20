@@ -209,4 +209,6 @@ def chat(user_b):
     return render_template('chat.html', mensajes=mensajes, otro=otro_usuario)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Render asigna un puerto automáticamente, por eso usamos os.environ.get
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
