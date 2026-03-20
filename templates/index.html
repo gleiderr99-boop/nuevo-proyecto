@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sabanalarga Market | Gleider Shop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #2563eb; --dark: #0f172a; --bg: #f1f5f9; }
@@ -14,32 +14,74 @@
         nav { 
             background: white; padding: 15px 5%; display: flex; 
             justify-content: space-between; align-items: center; 
-            sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
         }
-        .logo { font-weight: 600; color: var(--primary); font-size: 1.4rem; text-decoration: none; }
-        .nav-btns a { text-decoration: none; color: var(--dark); font-weight: 500; margin-left: 15px; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.4rem; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-btns { display: flex; align-items: center; }
+        .nav-btns a { text-decoration: none; font-weight: 600; margin-left: 15px; transition: 0.3s; }
+        
+        .login-link { color: #475569; }
+        .register-btn { 
+            background: var(--primary); color: white; padding: 10px 20px; 
+            border-radius: 50px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); 
+        }
+        .register-btn:hover { transform: scale(1.05); }
 
-        /* Banner de Bienvenida */
+        /* Nuevo Banner Premium */
         .hero { 
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80');
-            background-size: cover; background-position: center;
-            height: 250px; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; color: white; text-align: center;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); 
+            padding: 80px 20px; text-align: center; color: white; 
+            border-bottom-left-radius: 60px; border-bottom-right-radius: 60px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .hero h1 { font-size: 2.5rem; margin: 0 0 10px 0; font-weight: 800; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+
+        /* Categorías con Iconos */
+        .categories-bar {
+            display: flex; gap: 15px; overflow-x: auto; padding: 20px 5%; 
+            white-space: nowrap; scrollbar-width: none;
+        }
+        .categories-bar::-webkit-scrollbar { display: none; }
+        .cat-item {
+            background: white; padding: 12px 25px; border-radius: 50px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; 
+            display: flex; align-items: center; gap: 8px; font-weight: 600;
+            transition: 0.3s; border: 1px solid transparent;
+        }
+        .cat-item:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* Buscador Flotante */
+        .search-container { 
+            padding: 0 5%; max-width: 600px; margin: -35px auto 20px; 
+            position: relative; z-index: 5; 
+        }
+        .search-form { 
+            display: flex; gap: 10px; background: white; padding: 10px; 
+            border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+        .search-form input { 
+            flex: 1; border: none; padding: 10px 20px; outline: none; 
+            border-radius: 50px; font-family: 'Poppins'; font-size: 1rem;
+        }
+        .search-form button { 
+            background: var(--primary); color: white; border: none; 
+            padding: 10px 25px; border-radius: 50px; cursor: pointer; 
         }
 
         /* Cuadrícula de Productos */
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 25px; padding: 40px 5%; 
+            gap: 25px; padding: 20px 5% 40px; 
         }
         
         .card { 
             background: white; border-radius: 20px; overflow: hidden; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
-            transition: transform 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); 
+            transition: all 0.3s; border: none;
         }
-        .card:hover { transform: translateY(-5px); }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px rgba(0,0,0,0.1); }
         .card img { width: 100%; height: 230px; object-fit: cover; }
         
         .info { padding: 20px; }
@@ -47,31 +89,31 @@
         .price { font-size: 1.3rem; color: var(--primary); font-weight: 600; display: block; margin-bottom: 10px; }
         .vendedor-tag { font-size: 0.75rem; color: #64748b; margin-bottom: 15px; display: block; }
 
-        /* Estilo del Chat en el Index */
         .chat-form { border-top: 1px solid #f1f5f9; padding-top: 15px; margin-top: 15px; }
         .chat-form input { 
-            width: 100%; padding: 10px; border: 1px solid #e2e8f0; 
-            border-radius: 8px; margin-bottom: 8px; box-sizing: border-box;
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0; 
+            border-radius: 12px; margin-bottom: 8px; box-sizing: border-box;
         }
         .btn-chat { 
-            background: var(--primary); color: white; border: none; 
-            width: 100%; padding: 10px; border-radius: 8px; 
+            background: linear-gradient(45deg, #2563eb, #3b82f6); color: white; border: none; 
+            width: 100%; padding: 12px; border-radius: 50px; 
             font-weight: 600; cursor: pointer; display: flex; 
             align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
         
         .btn-login-to-chat {
             display: block; text-align: center; background: #e2e8f0; 
-            color: #475569; padding: 10px; border-radius: 8px; 
+            color: #475569; padding: 12px; border-radius: 50px; 
             text-decoration: none; font-size: 0.85rem; font-weight: 600;
         }
 
-        /* Footer */
-        .footer { background: var(--dark); color: white; padding: 40px 5%; text-align: center; }
+        .footer { background: var(--dark); color: white; padding: 60px 5%; text-align: center; }
         .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
 
         @media (max-width: 600px) {
             .grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -81,27 +123,36 @@
     <a href="/" class="logo">Sabanalarga Market</a>
     <div class="nav-btns">
         {% if session['user_name'] %}
-            <a href="/gleider_admin">Hola, {{ session['user_name'] }} <i class="fas fa-user-circle"></i></a>
+            <a href="/gleider_admin" style="color: var(--primary);"><i class="fas fa-user-circle"></i> Mi Panel</a>
         {% else %}
-            <a href="/login">Iniciar Sesión</a>
-            <a href="/registro" style="background: var(--primary); color: white; padding: 8px 15px; border-radius: 8px;">Vender</a>
+            <a href="/login" class="login-link">Entrar</a>
+            <a href="/registro" class="register-btn">Crear Cuenta Gratis</a>
         {% endif %}
     </div>
 </nav>
 
 <div class="hero">
-    <h1>Lo mejor de Sabanalarga en un solo lugar</h1>
-    <p>Apoya el comercio local de nuestro pueblo</p>
+    <h1>Sabanalarga Market</h1>
+    <p>Compra y vende fácil en nuestro pueblo. ¡Apoya lo local!</p>
 </div>
-<div style="padding: 20px 5%; max-width: 600px; margin: -40px auto 20px; position: relative; z-index: 5;">
-    <form action="/" method="GET" style="display: flex; gap: 10px; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-        <input type="text" name="q" placeholder="¿Qué buscas en Sabanalarga?" 
-               style="flex: 1; border: none; padding: 10px 20px; outline: none; border-radius: 50px; font-family: 'Poppins';">
-        <button type="submit" style="background: #2563eb; color: white; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer;">
+
+<div class="search-container">
+    <form action="/" method="GET" class="search-form">
+        <input type="text" name="q" placeholder="¿Qué buscas hoy?" autocomplete="off">
+        <button type="submit">
             <i class="fas fa-search"></i>
         </button>
     </form>
 </div>
+
+<div class="categories-bar">
+    <div class="cat-item"><i class="fas fa-tshirt" style="color: #2563eb;"></i> Ropa</div>
+    <div class="cat-item"><i class="fas fa-hamburger" style="color: #f59e0b;"></i> Comida</div>
+    <div class="cat-item"><i class="fas fa-mobile-alt" style="color: #10b981;"></i> Celulares</div>
+    <div class="cat-item"><i class="fas fa-tools" style="color: #ef4444;"></i> Servicios</div>
+    <div class="cat-item"><i class="fas fa-home" style="color: #8b5cf6;"></i> Hogar</div>
+</div>
+
 <div class="grid">
     {% for p in productos %}
     <div class="card">
@@ -115,9 +166,9 @@
             <div class="chat-form">
                 {% if session['user_id'] %}
                     <form action="/enviar_mensaje/{{ p.id }}" method="POST">
-                        <input type="text" name="mensaje" placeholder="Escribe tu duda al vendedor..." required>
+                        <input type="text" name="mensaje" placeholder="Pregunta al vendedor..." required>
                         <button type="submit" class="btn-chat">
-                            <i class="fas fa-paper-plane"></i> Chatear con Vendedor
+                            <i class="fas fa-paper-plane"></i> Chatear ahora
                         </button>
                     </form>
                 {% else %}
@@ -131,7 +182,7 @@
     {% else %}
     <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
         <i class="fas fa-box-open" style="font-size: 3rem; color: #cbd5e1;"></i>
-        <p style="color: #64748b; margin-top: 10px;">Aún no hay productos disponibles. ¡Sé el primero en vender!</p>
+        <p style="color: #64748b; margin-top: 10px;">Aún no hay productos disponibles.</p>
     </div>
     {% endfor %}
 </div>
@@ -139,8 +190,8 @@
 <div class="footer">
     <h3>¿Tienes un negocio en Sabanalarga?</h3>
     <p>Únete a la plataforma y aumenta tus ventas gratis.</p>
-    <a href="/registro">Registrar mi negocio ahora</a>
-    <p style="font-size: 0.7rem; margin-top: 30px; opacity: 0.5;">&copy; 2024 Gleider Shop - Marketplace Local</p>
+    <a href="/registro" style="color: white; background: var(--primary); padding: 10px 20px; border-radius: 50px; text-decoration: none; display: inline-block; margin-top: 10px;">Registrar mi negocio ahora</a>
+    <p style="font-size: 0.7rem; margin-top: 40px; opacity: 0.5;">&copy; 2026 Gleider Shop - Marketplace Local</p>
 </div>
 
 </body>
