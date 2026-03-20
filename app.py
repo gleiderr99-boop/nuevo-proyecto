@@ -86,6 +86,7 @@ def registro():
         return redirect(url_for('login'))
     return render_template('registro.html')
 
+# Busca tu función login y deja la redirección así:
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -95,9 +96,12 @@ def login():
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
             
-            # PRUEBA: En lugar de redirigir, vamos a imprimir un mensaje simple
-            return f"¡Logueado con éxito! Hola {user.nombre}. <a href='/'>Ir al inicio</a>"
-            
+            # Volvemos a la redirección normal
+            if user.es_admin or (user.telefono and user.telefono != "Cliente"):
+                return redirect(url_for('gleider_admin'))
+            else:
+                return redirect(url_for('inicio'))
+        
         return "Correo o contraseña incorrectos."
     return render_template('login.html')
 
