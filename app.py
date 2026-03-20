@@ -161,17 +161,29 @@ def enviar_mensaje(p_id):
     
     prod = Producto.query.get(p_id)
     contenido = request.form.get('mensaje')
+    emisor_id = session['user_id']
     
-    if contenido:
+    # LÓGICA INTELIGENTE DE RECEPTOR:
+    # Si el que escribe NO es el dueño, el mensaje va para el dueño (Vendedor).
+    if emisor_id != prod.user_id:
+        receptor_id = prod.user_id
+    else:
+        # Si el que escribe ES el dueño, necesitamos saber a qué cliente le responde.
+        # Para simplificar, lo sacamos de la URL del chat donde está parado.
+        receptor_id = request.form.get('receptor_id') 
+
+    if contenido and receptor_id:
         nuevo_m = Mensaje(
             contenido=contenido,
-            emisor_id=session['user_id'],
-            receptor_id=prod.user_id,
+            emisor_id=emisor_id,
+            receptor_id=int(receptor_id),
             producto_id=p_id
         )
         db.session.add(nuevo_m)
         db.session.commit()
-    return redirect(url_for('chat', user_b=prod.user_id))
+        return redirect(url_for('chat', user_b=receptor_id))
+    
+    return redirect(url_for('inicio'))
 
 @app.route('/chat/<int:user_b>')
 def chat(user_b):
