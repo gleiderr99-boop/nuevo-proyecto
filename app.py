@@ -97,21 +97,23 @@ def registro():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        # Buscamos al usuario por correo
         user = User.query.filter_by(correo=request.form['correo']).first()
+        
+        # Si el usuario existe y la clave es correcta
         if user and check_password_hash(user.password, request.form['pass']):
             session['user_id'] = user.id
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
             
-            # REGLA DE REDIRECCIÓN:
-            # Si eres el Admin (Gleider) o eres un Vendedor (tienes teléfono), vas al Panel.
+            # Redirección inteligente
             if user.es_admin or (user.telefono and user.telefono != "Cliente"):
                 return redirect(url_for('gleider_admin'))
-            # Si eres solo un Cliente, vas directo a la Tienda a comprar.
             else:
                 return redirect(url_for('inicio'))
-                
-        return "Datos incorrectos. <a href='/login'>Volver</a>"
+        
+        # Si falla, manda un mensaje claro
+        return "Correo o contraseña incorrectos. <a href='/login'>Intentar de nuevo</a>"
     return render_template('login.html')
 
 @app.route('/logout')
