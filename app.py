@@ -4,19 +4,21 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta_gleider' 
+app.secret_key = 'sabanalarga_pro_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 db = SQLAlchemy(app)
 
-# --- MODELOS DE BASE DE DATOS ---
+# --- MODELOS ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
     correo = db.Column(db.String(100), unique=True, nullable=False)
+    telefono = db.Column(db.String(20)) # Para el WhatsApp
     password = db.Column(db.String(200), nullable=False)
     es_admin = db.Column(db.Boolean, default=False)
+    productos = db.relationship('Producto', backref='vendedor', lazy=True)
 
 class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,7 +26,15 @@ class Producto(db.Model):
     precio = db.Column(db.Float)
     imagen = db.Column(db.String(200))
     descripcion = db.Column(db.Text)
-    categoria = db.Column(db.String(50), default='General')
+    categoria = db.Column(db.String(50))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    comentarios = db.relationship('Comentario', backref='producto', lazy=True, cascade="all, delete-orphan")
+
+class Comentario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    contenido = db.Column(db.Text, nullable=False)
+    cliente = db.Column(db.String(100), default="Cliente interesado")
+    producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
 
 with app.app_context():
     db.create_all()
@@ -33,112 +43,99 @@ with app.app_context():
 
 @app.route('/')
 def inicio():
-    return render_template('inicio.html')
+    productos = Producto.query.all()
+    return render_template('index.html', productos=productos)
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        correo_ingresado = request.form['correo']
-        pw_hash = generate_password_hash(request.form['pass'], method='pbkdf2:sha256')
+        correo = request.form['correo']
+        # Si eres tú, te hace Admin automáticamente
+        es_gleider = True if correo.lower() == 'gleiderr99@gmail.com' else False
         
-        soy_el_jefe = False
-        if correo_ingresado.lower() == 'gleiderr99@gmail.com': 
-            soy_el_jefe = True
-        
-        nuevo_usuario = User(
+        nuevo_u = User(
             nombre=request.form['nombre'],
-            correo=correo_ingresado,
-            password=pw_hash,
-            es_admin=soy_el_jefe 
+            correo=correo,
+            telefono=request.form['telefono'],
+            password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'),
+            es_admin=es_gleider
         )
-        
         try:
-            db.session.add(nuevo_usuario)
+            db.session.add(nuevo_u)
             db.session.commit()
             return redirect(url_for('login'))
         except:
-            return "Error: Este correo ya existe. <a href='/login'>Inicia sesión</a>"
-            
+            return "El correo ya existe. <a href='/login'>Inicia sesión</a>"
     return render_template('registro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        correo = request.form['correo']
-        clave = request.form['pass']
-        user = User.query.filter_by(correo=correo).first()
-        
-        if user and check_password_hash(user.password, clave):
+        user = User.query.filter_by(correo=request.form['correo']).first()
+        if user and check_password_hash(user.password, request.form['pass']):
             session['user_id'] = user.id
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
-            
-            if user.es_admin:
-                return redirect(url_for('gleider_admin'))
-            return redirect(url_for('catalogo'))
-        
-        return "Correo o clave incorrectos. <a href='/login'>Volver</a>"
+            return redirect(url_for('gleider_admin'))
+        return "Error en datos. <a href='/login'>Reintentar</a>"
     return render_template('login.html')
-
-@app.route('/catalogo')
-def catalogo():
-    productos = Producto.query.all()
-    return render_template('index.html', productos=productos)
 
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
-    if not session.get('es_admin'):
-        return redirect(url_for('login'))
+    if 'user_id' not in session: return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
     
     if request.method == 'POST':
-        # 1. Recogemos los datos primero
-        nombre = request.form.get('nombre')
-        precio = request.form.get('precio')
-        desc = request.form.get('descripcion')
-        categoria = request.form.get('categoria')
         file = request.files.get('foto')
-        
-        # 2. Verificamos y guardamos
-        if nombre and precio and file:
+        if file:
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            
-            nuevo_p = Producto(
-                nombre=nombre, 
-                precio=float(precio), 
-                imagen=filename, 
-                descripcion=desc, 
-                categoria=categoria
+            nuevo = Producto(
+                nombre=request.form.get('nombre'),
+                precio=float(request.form.get('precio')),
+                descripcion=request.form.get('descripcion'),
+                categoria=request.form.get('categoria'),
+                imagen=filename,
+                user_id=user.id
             )
-            db.session.add(nuevo_p)
+            db.session.add(nuevo)
             db.session.commit()
             return redirect(url_for('gleider_admin'))
 
-    productos = Producto.query.all()
-    usuarios = User.query.all() 
-    return render_template('admin.html', productos=productos, usuarios=usuarios)
+    # Tú ves todo, los vendedores solo lo suyo
+    if user.es_admin:
+        productos = Producto.query.all()
+        usuarios = User.query.all()
+    else:
+        productos = Producto.query.filter_by(user_id=user.id).all()
+        usuarios = []
+        
+    return render_template('admin.html', productos=productos, usuarios=usuarios, user=user)
+
+@app.route('/comentar/<int:p_id>', methods=['POST'])
+def comentar(p_id):
+    nuevo_c = Comentario(
+        contenido=request.form.get('comentario'),
+        cliente=request.form.get('nombre_cliente'),
+        producto_id=p_id
+    )
+    db.session.add(nuevo_c)
+    db.session.commit()
+    return redirect(url_for('inicio'))
+
+@app.route('/eliminar/<int:id>')
+def eliminar_producto(id):
+    p = Producto.query.get(id)
+    if p and (session.get('es_admin') or p.user_id == session.get('user_id')):
+        db.session.delete(p)
+        db.session.commit()
+    return redirect(url_for('gleider_admin'))
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('inicio'))
-    
-@app.route('/eliminar_producto/<int:id>')
-def eliminar_producto(id):
-    if not session.get('es_admin'):
-        return redirect(url_for('login'))
-    
-    producto = Producto.query.get(id)
-    if producto:
-        try:
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], producto.imagen))
-        except:
-            pass 
-            
-        db.session.delete(producto)
-        db.session.commit()
-    
-    return redirect(url_for('gleider_admin'))
 
 if __name__ == '__main__':
     app.run(debug=True)
