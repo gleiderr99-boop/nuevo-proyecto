@@ -61,11 +61,18 @@ def inicio():
 def registro():
     if request.method == 'POST':
         correo = request.form['correo']
+        tipo = request.form.get('tipo_usuario') # 'cliente' o 'vendedor'
+        
+        # El admin siempre es Gleider
         es_gleider = True if correo.lower() == 'gleiderr99@gmail.com' else False
+        
+        # Si es cliente, el teléfono será "Cliente", si es vendedor, lo que ponga en el input
+        tel_final = request.form.get('telefono') if tipo == 'vendedor' else "Cliente"
+        
         nuevo_u = User(
             nombre=request.form['nombre'],
             correo=correo,
-            telefono=request.form['telefono'],
+            telefono=tel_final,
             password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'),
             es_admin=es_gleider
         )
@@ -85,7 +92,15 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
-            return redirect(url_for('gleider_admin'))
+            
+            # REGLA DE REDIRECCIÓN:
+            # Si eres el Admin (Gleider) o eres un Vendedor (tienes teléfono), vas al Panel.
+            if user.es_admin or (user.telefono and user.telefono != "Cliente"):
+                return redirect(url_for('gleider_admin'))
+            # Si eres solo un Cliente, vas directo a la Tienda a comprar.
+            else:
+                return redirect(url_for('inicio'))
+                
         return "Datos incorrectos. <a href='/login'>Volver</a>"
     return render_template('login.html')
 
