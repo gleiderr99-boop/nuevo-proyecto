@@ -126,7 +126,30 @@
         <h2>Nuestra Colección</h2>
         <p>Calidad y estilo en cada prenda.</p>
     </header>
+    <div class="container" style="padding: 20px 5%; max-width: 1200px; margin: auto;">
+    <div style="margin-bottom: 20px;">
+        <input type="text" id="buscador" placeholder="🔍 Buscar por nombre (ej: Jean, Camisa...)" 
+               style="width: 100%; padding: 15px; border-radius: 50px; border: 1px solid #ddd; font-size: 1rem;">
+    </div>
 
+    <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;" id="filtros">
+        <button class="filter-btn active" data-cat="todas">Todas</button>
+        <button class="filter-btn" data-cat="Caballero">Caballero</button>
+        <button class="filter-btn" data-cat="Dama">Dama</button>
+        <button class="filter-btn" data-cat="Accesorios">Accesorios</button>
+    </div>
+</div>
+
+<style>
+    .filter-btn {
+        background: white; border: 1px solid var(--primary); color: var(--primary);
+        padding: 8px 20px; border-radius: 20px; cursor: pointer; white-space: nowrap;
+        transition: 0.3s; font-weight: 600;
+    }
+    .filter-btn.active, .filter-btn:hover {
+        background: var(--primary); color: white;
+    }
+</style>
     <div class="grid">
         {% for p in productos %}
         <div class="card">
