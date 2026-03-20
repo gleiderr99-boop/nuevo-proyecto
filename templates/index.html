@@ -161,6 +161,12 @@
             <span class="vendedor-tag"><i class="fas fa-store"></i> {{ p.vendedor.nombre }}</span>
             <h3>{{ p.nombre }}</h3>
             <span class="price">${{ "{:,.0f}".format(p.precio) }}</span>
+            <p style="font-size: 0.85rem; color: #64748b; margin-top: 10px;">
+    Vendido por: 
+    <a href="/perfil/{{ p.user_id }}" style="color: #2563eb; font-weight: 600; text-decoration: none;">
+        <i class="fas fa-user-circle"></i> {{ p.vendedor.nombre }}
+    </a>
+</p>
             <p style="font-size: 0.85rem; color: #64748b; line-height: 1.4;">{{ p.descripcion }}</p>
 
             <div class="chat-form">
