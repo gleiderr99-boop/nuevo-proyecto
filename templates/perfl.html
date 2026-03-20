@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil de {{ usuario.nombre }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; text-align: center; padding: 50px; }
+        .perfil-card { background: white; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .avatar { width: 100px; height: 100px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px; }
+        .btn-msg { background: #22c55e; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="perfil-card">
+        <div class="avatar">{{ usuario.nombre[0] }}</div>
+        <h1>{{ usuario.nombre }}</h1>
+        <p><i class="fas fa-envelope"></i> {{ usuario.correo }}</p>
+        {% if usuario.telefono != "Cliente" %}
+            <p><i class="fab fa-whatsapp"></i> {{ usuario.telefono }}</p>
+            <a href="https://wa.me/57{{ usuario.telefono }}" class="btn-msg" target="_blank">Contactar por WhatsApp</a>
+        {% endif %}
+        <br>
+        <a href="/" style="display:block; margin-top:20px; color: #64748b;">Volver a la tienda</a>
+    </div>
+</body>
+</html>
