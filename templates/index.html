@@ -168,6 +168,21 @@
         </div>
         {% endfor %}
     </div>
+<script>
+    const buscador = document.getElementById('buscador');
+    const tarjetas = document.querySelectorAll('.card');
 
+    buscador.addEventListener('input', () => {
+        const texto = buscador.value.toLowerCase();
+        tarjetas.forEach(card => {
+            const nombre = card.querySelector('h3').innerText.toLowerCase();
+            if(nombre.includes(texto)) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    });
+</script>
 </body>
 </html>
