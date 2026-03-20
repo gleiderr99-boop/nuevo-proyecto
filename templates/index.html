@@ -93,7 +93,15 @@
     <h1>Lo mejor de Sabanalarga en un solo lugar</h1>
     <p>Apoya el comercio local de nuestro pueblo</p>
 </div>
-
+<div style="padding: 20px 5%; max-width: 600px; margin: -40px auto 20px; position: relative; z-index: 5;">
+    <form action="/" method="GET" style="display: flex; gap: 10px; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <input type="text" name="q" placeholder="¿Qué buscas en Sabanalarga?" 
+               style="flex: 1; border: none; padding: 10px 20px; outline: none; border-radius: 50px; font-family: 'Poppins';">
+        <button type="submit" style="background: #2563eb; color: white; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer;">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+</div>
 <div class="grid">
     {% for p in productos %}
     <div class="card">
