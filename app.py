@@ -3,16 +3,17 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'sabanalarga_market_ultra_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
-# Asegurar que la carpeta de fotos exista
+# Asegurar que la carpeta de fotos exista con permisos correctos
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 db = SQLAlchemy(app)
 
@@ -66,7 +67,7 @@ def inicio():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        correo = request.form['correo'].lower()
+        correo = request.form['correo'].lower().strip()
         tipo = request.form.get('tipo_usuario')
         es_gleider = True if correo == 'gleiderr99@gmail.com' else False
         tel_final = request.form.get('telefono') if tipo == 'vendedor' else "Cliente"
@@ -86,21 +87,18 @@ def registro():
         return redirect(url_for('login'))
     return render_template('registro.html')
 
-# Busca tu función login y deja la redirección así:
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(correo=request.form['correo'].lower()).first()
+        user = User.query.filter_by(correo=request.form['correo'].lower().strip()).first()
         if user and check_password_hash(user.password, request.form['pass']):
             session['user_id'] = user.id
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
             
-            # Volvemos a la redirección normal
             if user.es_admin or (user.telefono and user.telefono != "Cliente"):
                 return redirect(url_for('gleider_admin'))
-            else:
-                return redirect(url_for('inicio'))
+            return redirect(url_for('inicio'))
         
         return "Correo o contraseña incorrectos."
     return render_template('login.html')
@@ -108,7 +106,7 @@ def login():
 @app.route('/recuperar', methods=['GET', 'POST'])
 def recuperar():
     if request.method == 'POST':
-        correo = request.form['correo'].lower()
+        correo = request.form['correo'].lower().strip()
         nueva_pass = request.form['nueva_pass']
         user = User.query.filter_by(correo=correo).first()
         if user:
@@ -125,12 +123,21 @@ def gleider_admin():
     
     if request.method == 'POST':
         file = request.files.get('foto')
-        if file:
-            filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        if file and file.filename != '':
+            # Limpiamos el nombre del archivo para evitar errores de sistema
+            filename = secure_filename(file.filename)
+            # Guardado con ruta absoluta
+            file.save(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], filename))
+            
+            # Seguro para el precio
+            try:
+                precio_val = float(request.form.get('precio', 0))
+            except ValueError:
+                precio_val = 0.0
+
             nuevo = Producto(
                 nombre=request.form.get('nombre'),
-                precio=float(request.form.get('precio')),
+                precio=precio_val,
                 descripcion=request.form.get('descripcion'),
                 categoria=request.form.get('categoria'),
                 imagen=filename,
@@ -154,7 +161,6 @@ def chat(user_b):
     if 'user_id' not in session: return redirect(url_for('login'))
     yo = session['user_id']
     
-    # Marcar mensajes como leídos al entrar al chat
     Mensaje.query.filter_by(receptor_id=yo, emisor_id=user_b, leido=False).update({Mensaje.leido: True})
     db.session.commit()
 
@@ -172,11 +178,9 @@ def enviar_mensaje(p_id):
     prod = Producto.query.get(p_id)
     emisor_id = session['user_id']
     
-    # Si soy el dueño del producto, respondo al cliente (receptor_id viene del form)
     if emisor_id == prod.user_id:
         receptor_id = request.form.get('receptor_id')
     else:
-        # Si soy el cliente, le escribo al dueño
         receptor_id = prod.user_id
 
     if receptor_id:
