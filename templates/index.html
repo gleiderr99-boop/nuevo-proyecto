@@ -3,186 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gleider Shop | Catálogo</title>
+    <title>Sabanalarga Ventas | Gleider Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
-        :root { --primary: #2563eb; --dark: #1e293b; --light: #f1f5f9; --whatsapp: #25d366; }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--light); 
-            margin: 0; 
-            padding-bottom: 50px;
-        }
-
-        /* Navegación */
-        nav { 
-            background: white; 
-            padding: 15px 5%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        nav h1 { font-size: 1.2rem; color: var(--primary); margin: 0; }
-        .user-info { font-size: 0.9rem; color: var(--dark); }
-        .logout-btn { color: #ef4444; text-decoration: none; font-weight: 600; margin-left: 15px; }
-
-        /* Encabezado */
-        .hero { text-align: center; padding: 40px 20px; }
-        .hero h2 { font-size: 2rem; color: var(--dark); margin-bottom: 10px; }
-        .hero p { color: #64748b; }
-
-        /* Cuadrícula de productos */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 25px; 
-            padding: 0 5%; 
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        /* Tarjeta de Producto */
-        .card { 
-            background: white; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-        }
-        .card:hover { 
-            transform: translateY(-10px); 
-            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
-        }
-
-        /* Imagen con efecto */
-        .card-img-container { width: 100%; height: 300px; overflow: hidden; }
-        .card img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transition: transform 0.5s ease;
-        }
-        .card:hover img { transform: scale(1.1); }
-
-        /* Info del producto */
-        .card-body { padding: 20px; text-align: center; }
-        .card-body h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--dark); }
-        .card-body p { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; height: 40px; overflow: hidden; }
-        
-        /* Precio estilizado */
-        .price { 
-            font-size: 1.4rem; 
-            font-weight: 600; 
-            color: var(--primary); 
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        /* Botón de WhatsApp Pro */
-        .wa-btn { 
-            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); 
-            color: white; 
-            padding: 12px; 
-            text-decoration: none; 
-            border-radius: 12px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .wa-btn:hover { filter: brightness(1.1); }
-        .wa-btn i { font-size: 1.2rem; }
-
-        @media (max-width: 600px) {
-            .grid { grid-template-columns: 1fr; padding: 0 20px; }
-        }
+        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; }
+        nav { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px 5%; }
+        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 250px; object-fit: cover; }
+        .info { padding: 20px; }
+        .price { font-size: 1.5rem; color: var(--primary); font-weight: 600; }
+        .vendedor-tag { font-size: 0.8rem; color: #64748b; background: #e2e8f0; padding: 3px 10px; border-radius: 50px; }
+        .btn-wa { background: #25d366; color: white; display: block; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; margin-top: 10px; }
+        .comments-section { background: #f1f5f9; padding: 15px; border-top: 1px solid #e2e8f0; }
+        .comment-item { font-size: 0.85rem; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; box-sizing: border-box; }
+        .footer-vendedores { background: var(--dark); color: white; padding: 40px; text-align: center; margin-top: 40px; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <h1>Gleider Shop</h1>
-        <div class="user-info">
-            {% if session['user_name'] %}
-                <span><i class="fas fa-user"></i> {{ session['user_name'] }}</span>
-                <a href="/logout" class="logout-btn">Salir</a>
-            {% else %}
-                <a href="/login" style="text-decoration: none; color: var(--primary); font-weight: 600;">Iniciar Sesión</a>
-            {% endif %}
+<nav>
+    <h2 style="margin:0; color:var(--primary)">Sabanalarga Market</h2>
+    {% if session['user_name'] %}
+        <a href="/gleider_admin" style="text-decoration:none; color:var(--primary); font-weight:600">Mi Panel</a>
+    {% else %}
+        <a href="/login" style="text-decoration:none; color:var(--primary)">Vendedores</a>
+    {% endif %}
+</nav>
+
+<div class="grid">
+    {% for p in productos %}
+    <div class="card">
+        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+        <div class="info">
+            <span class="vendedor-tag"><i class="fas fa-store"></i> {{ p.vendedor.nombre }}</span>
+            <h3 style="margin:10px 0">{{ p.nombre }}</h3>
+            <p style="font-size:0.9rem; color:#475569">{{ p.descripcion }}</p>
+            <span class="price">${{ "{:,.0f}".format(p.precio) }}</span>
+            
+            <a href="https://wa.me/57{{ p.vendedor.telefono }}?text=Hola%20{{ p.vendedor.nombre }},%20vi%20tu%20producto%20{{ p.nombre }}%20en%20GleiderShop" class="btn-wa">
+                <i class="fab fa-whatsapp"></i> Preguntar al Vendedor
+            </a>
         </div>
-    </nav>
 
-    <header class="hero">
-        <h2>Nuestra Colección</h2>
-        <p>Calidad y estilo en cada prenda.</p>
-    </header>
-    <div class="container" style="padding: 20px 5%; max-width: 1200px; margin: auto;">
-    <div style="margin-bottom: 20px;">
-        <input type="text" id="buscador" placeholder="🔍 Buscar por nombre (ej: Jean, Camisa...)" 
-               style="width: 100%; padding: 15px; border-radius: 50px; border: 1px solid #ddd; font-size: 1rem;">
+        <div class="comments-section">
+            <h4 style="margin:0 0 10px 0; font-size:0.9rem">Preguntas:</h4>
+            {% for c in p.comentarios %}
+                <div class="comment-item"><strong>{{ c.cliente }}:</strong> {{ c.contenido }}</div>
+            {% endfor %}
+            <form action="/comentar/{{ p.id }}" method="POST" style="margin-top:10px">
+                <input type="text" name="nombre_cliente" placeholder="Tu nombre" required>
+                <input type="text" name="comentario" placeholder="Escribe tu duda..." required>
+                <button type="submit" style="margin-top:5px; width:100%; padding:5px; border-radius:5px; border:none; background:var(--primary); color:white; cursor:pointer">Enviar duda</button>
+            </form>
+        </div>
     </div>
+    {% endfor %}
+</div>
 
-    <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;" id="filtros">
-        <button class="filter-btn active" data-cat="todas">Todas</button>
-        <button class="filter-btn" data-cat="Caballero">Caballero</button>
-        <button class="filter-btn" data-cat="Dama">Dama</button>
-        <button class="filter-btn" data-cat="Accesorios">Accesorios</button>
+<div class="footer-vendedores">
+    <h3>¿Eres de Sabanalarga y quieres vender?</h3>
+    <p>Sube tus productos aquí y llega a más gente del pueblo.</p>
+    <div style="margin-top:20px">
+        <a href="/registro" style="background:var(--primary); color:white; padding:12px 25px; border-radius:50px; text-decoration:none; margin-right:10px">Crear Cuenta</a>
+        <a href="/login" style="background:white; color:var(--dark); padding:12px 25px; border-radius:50px; text-decoration:none">Entrar</a>
     </div>
 </div>
 
-<style>
-    .filter-btn {
-        background: white; border: 1px solid var(--primary); color: var(--primary);
-        padding: 8px 20px; border-radius: 20px; cursor: pointer; white-space: nowrap;
-        transition: 0.3s; font-weight: 600;
-    }
-    .filter-btn.active, .filter-btn:hover {
-        background: var(--primary); color: white;
-    }
-</style>
-    <div class="grid">
-        {% for p in productos %}
-        <div class="card">
-            <div class="card-img-container">
-                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}">
-            </div>
-            <div class="card-body">
-                <h3>{{ p.nombre }}</h3>
-                <p>{{ p.descripcion }}</p>
-                <span class="price">${{ "{:,.0f}".format(p.precio) }}</span>
-                
-                <a href="https://wa.me/573245181423?text=Hola%20Gleider,%20me%20interesa%20comprar:%20{{ p.nombre }}" class="wa-btn">
-                    <i class="fab fa-whatsapp"></i> Pedir por WhatsApp
-                </a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-<script>
-    const buscador = document.getElementById('buscador');
-    const tarjetas = document.querySelectorAll('.card');
-
-    buscador.addEventListener('input', () => {
-        const texto = buscador.value.toLowerCase();
-        tarjetas.forEach(card => {
-            const nombre = card.querySelector('h3').innerText.toLowerCase();
-            if(nombre.includes(texto)) {
-                card.style.display = "block";
-            } else {
-                card.style.display = "none";
-            }
-        });
-    });
-</script>
 </body>
 </html>
