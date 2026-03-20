@@ -24,6 +24,7 @@ class Producto(db.Model):
     precio = db.Column(db.Float)
     imagen = db.Column(db.String(200))
     descripcion = db.Column(db.Text)
+    categoria = db.Column(db.String(50), default='General')
 
 with app.app_context():
     db.create_all()
