@@ -8,87 +8,132 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        :root { --primary: #2563eb; --dark: #1e293b; --light: #f8fafc; --success: #22c55e; }
-        body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; display: flex; }
+        :root { --primary: #2563eb; --dark: #1e293b; --light: #f8fafc; --danger: #ef4444; }
+        body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; display: flex; scroll-behavior: smooth; }
         
         /* Sidebar lateral */
-        .sidebar { width: 250px; background: var(--dark); height: 100vh; color: white; padding: 20px; position: fixed; }
-        .sidebar h2 { font-size: 1.5rem; margin-bottom: 30px; color: var(--primary); }
+        .sidebar { width: 250px; background: var(--dark); height: 100vh; color: white; padding: 20px; position: fixed; z-index: 100; }
+        .sidebar h2 { font-size: 1.5rem; margin-bottom: 30px; color: var(--primary); text-align: center; }
         .nav-link { display: block; color: #94a3b8; padding: 12px; text-decoration: none; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background: var(--primary); color: white; }
         
         /* Contenido Principal */
-        .main-content { margin-left: 250px; padding: 40px; width: 100%; }
+        .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
         /* Tarjetas de Estadísticas */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); text-align: center; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
         .stat-card i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
         
-        /* Formulario Estilizado */
-        .glass-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; }
+        /* Contenedores Blancos (Cards) */
+        .glass-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 40px; }
+        h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; color: var(--dark); }
+
+        /* Formulario */
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; box-sizing: border-box; }
         button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s; }
         button:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        /* Tabla de Clientes/Productos */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 15px; overflow: hidden; }
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        th { background: #f8fafc; color: #64748b; }
-        .img-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+        th { background: #f8fafc; color: #64748b; font-weight: 600; }
+        .img-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #eee; }
+        
+        /* Botón Eliminar */
+        .btn-delete { color: var(--danger); text-decoration: none; font-size: 1.2rem; transition: 0.2s; }
+        .btn-delete:hover { transform: scale(1.2); display: inline-block; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; padding: 10px; }
+            .sidebar h2, .nav-link span { display: none; }
+            .main-content { margin-left: 70px; padding: 20px; width: calc(100% - 70px); }
+        }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>Gleider Admin</h2>
-        <a href="#inventario" class="nav-link active"><i class="fas fa-box"></i> Inventario</a>
-        <a href="#clientes" class="nav-link"><i class="fas fa-users"></i> Clientes</a>
-        <a href="/catalogo" class="nav-link"><i class="fas fa-eye"></i> Ver Tienda</a>
-        <a href="/logout" class="nav-link" style="margin-top: 50px; color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Salir</a>
+        <h2>Gleider</h2>
+        <a href="#inventario" class="nav-link active"><i class="fas fa-plus-circle"></i> <span>Nuevo Producto</span></a>
+        <a href="#gestion-inventario" class="nav-link"><i class="fas fa-boxes"></i> <span>Gestionar Stock</span></a>
+        <a href="#clientes" class="nav-link"><i class="fas fa-users"></i> <span>Clientes</span></a>
+        <a href="/catalogo" class="nav-link"><i class="fas fa-eye"></i> <span>Ver Tienda</span></a>
+        <a href="/logout" class="nav-link" style="margin-top: 50px; color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> <span>Salir</span></a>
     </div>
 
     <div class="main-content">
         <div class="header">
             <h1>Panel de Control</h1>
-            <span id="fecha"></span>
+            <span id="fecha" style="font-weight: 600; color: var(--primary);"></span>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
                 <i class="fas fa-tshirt"></i>
                 <h3>{{ productos|length }}</h3>
-                <p>Productos</p>
+                <p>Productos Activos</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-user-friends"></i>
                 <h3>{{ usuarios|length }}</h3>
-                <p>Clientes Registrados</p>
+                <p>Clientes Totales</p>
             </div>
         </div>
 
         <div class="glass-card" id="inventario">
-            <h3><i class="fas fa-plus-circle"></i> Agregar Nuevo Producto</h3>
+            <h3><i class="fas fa-plus-circle" style="color: var(--primary);"></i> Agregar Mercancía</h3>
             <form method="POST" enctype="multipart/form-data">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <input type="text" name="nombre" placeholder="Nombre del artículo" required>
                     <input type="number" name="precio" placeholder="Precio (COP)" required>
                 </div>
-                <textarea name="descripcion" placeholder="Detalles: tallas disponibles, colores, material..." rows="3"></textarea>
+                <textarea name="descripcion" placeholder="Detalles (Tallas, colores, material...)" rows="3" required></textarea>
+                <label style="font-size: 0.8rem; color: #64748b;">Imagen del producto:</label>
                 <input type="file" name="foto" accept="image/*" required>
-                <button type="submit">Publicar en la Tienda</button>
+                <button type="submit">Publicar Producto</button>
             </form>
         </div>
 
-        <div class="glass-card" style="margin-top: 40px;" id="clientes">
-            <h3><i class="fas fa-users"></i> Clientes Registrados</h3>
+        <div class="glass-card" id="gestion-inventario">
+            <h3><i class="fas fa-tasks" style="color: #f59e0b;"></i> Gestionar Inventario</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th style="text-align: center;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr>
+                        <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="img-preview" onerror="this.src='https://via.placeholder.com/50'"></td>
+                        <td><strong>{{ p.nombre }}</strong></td>
+                        <td>${{ "{:,.0f}".format(p.precio) }}</td>
+                        <td style="text-align: center;">
+                            <a href="{{ url_for('eliminar_producto', id=p.id) }}" 
+                               onclick="return confirm('¿Segura que quieres eliminar este producto?')" 
+                               class="btn-delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-card" id="clientes">
+            <h3><i class="fas fa-users" style="color: var(--success);"></i> Clientes Registrados</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
+                        <th>Correo Electrónico</th>
+                        <th>Tipo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,7 +141,11 @@
                     <tr>
                         <td><strong>{{ u.nombre }}</strong></td>
                         <td>{{ u.correo }}</td>
-                        <td>{{ 'Admin' if u.es_admin else 'Cliente' }}</td>
+                        <td>
+                            <span style="padding: 4px 8px; border-radius: 5px; font-size: 0.8rem; background: {{ '#dcfce7' if not u.es_admin else '#dbeafe' }}; color: {{ '#166534' if not u.es_admin else '#1e40af' }};">
+                                {{ 'Administrador' if u.es_admin else 'Cliente' }}
+                            </span>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -105,7 +154,7 @@
     </div>
 
     <script>
-        document.getElementById('fecha').innerText = new Date().toLocaleDateString();
+        document.getElementById('fecha').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     </script>
 </body>
 </html>
