@@ -3,143 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gleider Shop | Dashboard</title>
+    <title>Panel de Control | Sabanalarga Market</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
         :root { --primary: #2563eb; --dark: #1e293b; --light: #f8fafc; --danger: #ef4444; --success: #22c55e; }
-        body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; display: flex; scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; display: flex; }
         
-        /* Sidebar lateral */
-        .sidebar { width: 250px; background: var(--dark); height: 100vh; color: white; padding: 20px; position: fixed; z-index: 100; }
-        .sidebar h2 { font-size: 1.5rem; margin-bottom: 30px; color: var(--primary); text-align: center; }
-        .nav-link { display: block; color: #94a3b8; padding: 12px; text-decoration: none; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; }
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--dark); height: 100vh; color: white; padding: 20px; position: fixed; }
+        .sidebar h2 { color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 30px; }
+        .nav-link { display: block; color: #94a3b8; padding: 12px; text-decoration: none; border-radius: 10px; margin-bottom: 8px; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background: var(--primary); color: white; }
         
-        /* Contenido Principal */
-        .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* Contenido */
+        .main-content { margin-left: 260px; padding: 40px; width: 100%; box-sizing: border-box; }
+        .glass-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px; }
         
-        /* Tarjetas de Estadísticas */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-        .stat-card i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
-        
-        /* Contenedores Blancos (Cards) */
-        .glass-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 40px; }
-        h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; color: var(--dark); }
-
         /* Formulario */
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; }
+        button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; }
+
+        /* Estilo de Mensajes en el Panel */
+        .msg-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; background: #f8fafc; border-radius: 12px; 
+            margin-bottom: 10px; border-left: 4px solid var(--primary);
+            text-decoration: none; color: inherit; transition: 0.2s;
+        }
+        .msg-item:hover { background: #f1f5f9; transform: translateX(5px); }
 
         /* Tablas */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        th { background: #f8fafc; color: #64748b; font-weight: 600; }
-        .img-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #eee; }
-        
-        /* Botón Eliminar */
-        .btn-delete { color: var(--danger); text-decoration: none; font-size: 1.2rem; transition: 0.2s; }
-        .btn-delete:hover { transform: scale(1.2); display: inline-block; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        .img-preview { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
 
         @media (max-width: 768px) {
-            .sidebar { width: 70px; padding: 10px; }
+            .sidebar { width: 60px; padding: 10px; }
             .sidebar h2, .nav-link span { display: none; }
-            .main-content { margin-left: 70px; padding: 20px; width: calc(100% - 70px); }
+            .main-content { margin-left: 60px; padding: 15px; }
         }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>Gleider Admin</h2>
-        <a href="#inventario" class="nav-link active"><i class="fas fa-plus-circle"></i> <span>Nuevo Producto</span></a>
-        <a href="#gestion-inventario" class="nav-link"><i class="fas fa-boxes"></i> <span>Mis Productos</span></a>
-        
-        <a href="/" class="nav-link"><i class="fas fa-eye"></i> <span>Ver Tienda</span></a>
-        
-        {% if session['es_admin'] %}
-        <a href="#clientes" class="nav-link"><i class="fas fa-users"></i> <span>Vendedores</span></a>
+        <h2>SABANALARGA<br>MARKET</h2>
+        <a href="/" class="nav-link"><i class="fas fa-home"></i> <span>Ir a la Tienda</span></a>
+        <a href="#mensajes" class="nav-link"><i class="fas fa-comment-dots"></i> <span>Mensajes</span></a>
+        <a href="#productos" class="nav-link"><i class="fas fa-box"></i> <span>Mis Productos</span></a>
+        {% if user.es_admin %}
+            <a href="#vendedores" class="nav-link"><i class="fas fa-users-cog"></i> <span>Vendedores</span></a>
         {% endif %}
-        
-        <a href="/logout" class="nav-link" style="margin-top: 50px; color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> <span>Salir</span></a>
+        <a href="/logout" class="nav-link" style="margin-top: 50px; color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a>
     </div>
 
     <div class="main-content">
-        <div class="header">
-            <div>
-                <h1>Panel de Control</h1>
-                <p style="color: #64748b; margin: 0;">Bienvenido, {{ session['user_name'] }}</p>
-            </div>
-            <span id="fecha" style="font-weight: 600; color: var(--primary);"></span>
-        </div>
+        <header style="margin-bottom: 30px;">
+            <h1>Hola, {{ user.nombre }} 👋</h1>
+            <p style="color: #64748b;">Gestiona tu negocio y responde a tus clientes.</p>
+        </header>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-tshirt"></i>
-                <h3>{{ productos|length }}</h3>
-                <p>Tus Productos</p>
-            </div>
-            {% if session['es_admin'] %}
-            <div class="stat-card">
-                <i class="fas fa-store"></i>
-                <h3>{{ usuarios|length }}</h3>
-                <p>Vendedores Totales</p>
-            </div>
+        <div class="glass-card" id="mensajes">
+            <h3><i class="fas fa-envelope"></i> Mensajes de Clientes</h3>
+            {% if mensajes %}
+                {% for m in mensajes %}
+                <a href="/chat/{{ m.emisor_id }}" class="msg-item">
+                    <div>
+                        <strong>{{ m.emisor.nombre }}</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #64748b;">{{ m.contenido[:50] }}...</p>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p style="color: #94a3b8; text-align: center;">No tienes mensajes nuevos todavía.</p>
             {% endif %}
         </div>
 
-        <div class="glass-card" id="inventario">
-            <h3><i class="fas fa-plus-circle" style="color: var(--primary);"></i> Agregar Mercancía</h3>
+        <div class="glass-card" id="nuevo">
+            <h3><i class="fas fa-plus-circle"></i> Publicar Nuevo Producto</h3>
             <form method="POST" enctype="multipart/form-data">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <input type="text" name="nombre" placeholder="Nombre del artículo" required>
-                    <input type="number" name="precio" placeholder="Precio (COP)" required>
-                </div>
-                
-                <select name="categoria" required>
-                    <option value="" disabled selected>Selecciona una categoría</option>
-                    <option value="Caballero">Caballero</option>
-                    <option value="Dama">Dama</option>
-                    <option value="Accesorios">Accesorios</option>
+                <input type="text" name="nombre" placeholder="Nombre del producto" required>
+                <input type="number" name="precio" placeholder="Precio en COP" required>
+                <select name="categoria">
+                    <option value="Ropa">Ropa</option>
                     <option value="Calzado">Calzado</option>
-                </select> 
-                
-                <textarea name="descripcion" placeholder="Detalles (Tallas, colores, material...)" rows="3" required></textarea>
-                <label style="font-size: 0.8rem; color: #64748b; display: block; margin-top: 10px;">Imagen del producto:</label>
+                    <option value="Accesorios">Accesorios</option>
+                    <option value="Comida">Comida / Emprendimiento</option>
+                </select>
+                <textarea name="descripcion" placeholder="Descripción breve..." rows="2" required></textarea>
                 <input type="file" name="foto" accept="image/*" required>
-                <button type="submit">Publicar Producto en la Tienda</button>
+                <button type="submit">Subir a Sabanalarga Market</button>
             </form>
         </div>
 
-        <div class="glass-card" id="gestion-inventario">
-            <h3><i class="fas fa-tasks" style="color: #f59e0b;"></i> Gestionar tus Productos</h3>
+        <div class="glass-card" id="productos">
+            <h3><i class="fas fa-boxes"></i> Tu Inventario</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Imagen</th>
+                        <th>Foto</th>
                         <th>Producto</th>
                         <th>Precio</th>
-                        <th style="text-align: center;">Acción</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in productos %}
                     <tr>
-                        <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="img-preview" onerror="this.src='https://via.placeholder.com/50'"></td>
-                        <td>
-                            <strong>{{ p.nombre }}</strong><br>
-                            <small style="color: #64748b;">{{ p.categoria }}</small>
-                        </td>
+                        <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="img-preview"></td>
+                        <td>{{ p.nombre }}</td>
                         <td>${{ "{:,.0f}".format(p.precio) }}</td>
-                        <td style="text-align: center;">
-                            <a href="{{ url_for('eliminar_producto', id=p.id) }}" 
-                               onclick="return confirm('¿Seguro que quieres borrar este producto?')" 
-                               class="btn-delete">
-                                <i class="fas fa-trash-alt"></i>
+                        <td>
+                            <a href="/eliminar/{{ p.id }}" style="color: var(--danger);" onclick="return confirm('¿Eliminar producto?')">
+                                <i class="fas fa-trash"></i>
                             </a>
                         </td>
                     </tr>
@@ -148,29 +126,23 @@
             </table>
         </div>
 
-        {% if session['es_admin'] %}
-        <div class="glass-card" id="clientes">
-            <h3><i class="fas fa-users" style="color: var(--success);"></i> Vendedores de Sabanalarga</h3>
+        {% if user.es_admin %}
+        <div class="glass-card" id="vendedores">
+            <h3><i class="fas fa-users"></i> Control de Vendedores</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Negocio</th>
+                        <th>Nombre</th>
                         <th>WhatsApp</th>
                         <th>Correo</th>
-                        <th>Rol</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for u in usuarios %}
                     <tr>
-                        <td><strong>{{ u.nombre }}</strong></td>
-                        <td><a href="https://wa.me/57{{ u.telefono }}" target="_blank" style="color: var(--primary); text-decoration: none;">{{ u.telefono }}</a></td>
+                        <td>{{ u.nombre }}</td>
+                        <td>{{ u.telefono }}</td>
                         <td>{{ u.correo }}</td>
-                        <td>
-                            <span style="padding: 4px 8px; border-radius: 5px; font-size: 0.8rem; background: {{ '#dbeafe' if u.es_admin else '#f1f5f9' }}; color: {{ '#1e40af' if u.es_admin else '#475569' }};">
-                                {{ 'Super Admin' if u.es_admin else 'Vendedor' }}
-                            </span>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -179,8 +151,5 @@
         {% endif %}
     </div>
 
-    <script>
-        document.getElementById('fecha').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    </script>
 </body>
 </html>
