@@ -3,103 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Vendedores | Sabanalarga</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Registro | Sabanalarga Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2563eb; --dark: #0f172a; }
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: #f1f5f9; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
-        }
-        .register-card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 400px; 
-        }
-        h2 { text-align: center; color: var(--dark); margin-bottom: 10px; }
-        p { text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 25px; }
+        :root { --primary: #2563eb; --vendedor: #059669; }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
         
-        .input-group { margin-bottom: 15px; position: relative; }
-        .input-group i { position: absolute; left: 15px; top: 15px; color: #94a3b8; }
+        .selector-tipo { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tipo-btn { flex: 1; padding: 15px; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 600; color: #64748b; }
+        .tipo-btn i { display: block; font-size: 1.5rem; margin-bottom: 5px; }
         
-        input { 
-            width: 100%; 
-            padding: 12px 12px 12px 45px; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 12px; 
-            font-family: inherit; 
-            box-sizing: border-box; 
-            outline: none;
-            transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        /* Cuando se selecciona Cliente */
+        #tipo-cliente.active { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+        /* Cuando se selecciona Vendedor */
+        #tipo-vendedor.active { border-color: var(--vendedor); color: var(--vendedor); background: #ecfdf5; }
+
+        .form-group { display: none; text-align: left; animation: fadeIn 0.5s; }
+        .form-group.active { display: block; }
+
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         
-        button { 
-            width: 100%; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            border-radius: 12px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            margin-top: 10px;
-        }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        
-        .footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
-        .footer-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="register-card">
-        <h2>Únete a la Red 🛍️</h2>
-        <p>Crea tu cuenta de vendedor y empieza a publicar tus productos en Sabanalarga.</p>
+<div class="card">
+    <h2>¿Cómo quieres unirte?</h2>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">Selecciona una opción para continuar</p>
 
-        <form action="/registro" method="POST">
-            <div class="input-group">
-                <i class="fas fa-store"></i>
-                <input type="text" name="nombre" placeholder="Nombre de tu negocio" required>
-            </div>
-
-            <div class="input-group">
-                <i class="fab fa-whatsapp"></i>
-                <input type="text" name="telefono" placeholder="WhatsApp (Ej: 3001234567)" required>
-            </div>
-
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" name="correo" placeholder="Tu correo electrónico" required>
-            </div>
-
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" name="pass" placeholder="Crea una contraseña" required>
-            </div>
-
-            <button type="submit">Crear Cuenta de Vendedor</button>
-        </form>
-
-        <div class="footer-link">
-            ¿Ya tienes cuenta? <a href="/login">Inicia Sesión aquí</a>
+    <div class="selector-tipo">
+        <div class="tipo-btn" id="btn-c" onclick="seleccionar('cliente')">
+            <i class="fas fa-shopping-bag"></i> Soy Cliente
         </div>
-        
-        <div style="text-align: center; margin-top: 15px;">
-            <a href="/" style="color: #64748b; text-decoration: none; font-size: 0.8rem;"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
+        <div class="tipo-btn" id="btn-v" onclick="seleccionar('vendedor')">
+            <i class="fas fa-store"></i> Soy Vendedor
         </div>
     </div>
+
+    <form action="/registro" method="POST" id="registro-form" class="form-group">
+        <input type="hidden" name="tipo_usuario" id="tipo_usuario" value="cliente">
+        
+        <input type="text" name="nombre" id="label_nombre" placeholder="Tu nombre completo" required>
+        <input type="email" name="correo" placeholder="Tu correo electrónico" required>
+        
+        <div id="campos-vendedor" style="display: none;">
+            <input type="text" name="telefono" id="input_tel" placeholder="Número de WhatsApp">
+        </div>
+
+        <input type="password" name="pass" placeholder="Crea una contraseña" required>
+        
+        <button type="submit" id="btn-submit">Crear cuenta de Cliente</button>
+    </form>
+
+    <div style="margin-top: 20px; font-size: 0.9rem;">
+        ¿Ya tienes cuenta? <a href="/login" style="color: var(--primary); text-decoration: none; font-weight: 600;">Inicia sesión</a>
+    </div>
+</div>
+
+<script>
+    function seleccionar(tipo) {
+        // Reset botones
+        document.getElementById('btn-c').classList.remove('active');
+        document.getElementById('btn-v').classList.remove('active');
+        
+        // Activar el formulario
+        document.getElementById('registro-form').classList.add('active');
+        
+        if(tipo === 'cliente') {
+            document.getElementById('btn-c').classList.add('active');
+            document.getElementById('tipo_usuario').value = 'cliente';
+            document.getElementById('campos-vendedor').style.display = 'none';
+            document.getElementById('input_tel').required = false;
+            document.getElementById('label_nombre').placeholder = "Tu nombre completo";
+            document.getElementById('btn-submit').innerText = "Crear cuenta de Cliente";
+            document.getElementById('btn-submit').style.background = "#2563eb";
+        } else {
+            document.getElementById('btn-v').classList.add('active');
+            document.getElementById('tipo_usuario').value = 'vendedor';
+            document.getElementById('campos-vendedor').style.display = 'block';
+            document.getElementById('input_tel').required = true;
+            document.getElementById('label_nombre').placeholder = "Nombre de tu Negocio";
+            document.getElementById('btn-submit').innerText = "Registrar mi Negocio";
+            document.getElementById('btn-submit').style.background = "#059669";
+        }
+    }
+</script>
 
 </body>
 </html>
