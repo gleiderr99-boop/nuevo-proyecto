@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        :root { --primary: #2563eb; --dark: #1e293b; --light: #f8fafc; --danger: #ef4444; }
+        :root { --primary: #2563eb; --dark: #1e293b; --light: #f8fafc; --danger: #ef4444; --success: #22c55e; }
         body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; display: flex; scroll-behavior: smooth; }
         
         /* Sidebar lateral */
@@ -31,7 +31,7 @@
         h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; color: var(--dark); }
 
         /* Formulario */
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; box-sizing: border-box; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; box-sizing: border-box; }
         button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s; }
         button:hover { opacity: 0.9; transform: translateY(-2px); }
 
@@ -54,11 +54,26 @@
 </head>
 <body>
 
-   <a href="/" class="nav-link">
+    <div class="sidebar">
+        <h2>Gleider Admin</h2>
+        <a href="#inventario" class="nav-link active"><i class="fas fa-plus-circle"></i> <span>Nuevo Producto</span></a>
+        <a href="#gestion-inventario" class="nav-link"><i class="fas fa-boxes"></i> <span>Mis Productos</span></a>
+        
+        <a href="/" class="nav-link"><i class="fas fa-eye"></i> <span>Ver Tienda</span></a>
+        
+        {% if session['es_admin'] %}
+        <a href="#clientes" class="nav-link"><i class="fas fa-users"></i> <span>Vendedores</span></a>
+        {% endif %}
+        
+        <a href="/logout" class="nav-link" style="margin-top: 50px; color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> <span>Salir</span></a>
+    </div>
 
     <div class="main-content">
         <div class="header">
-            <h1>Panel de Control</h1>
+            <div>
+                <h1>Panel de Control</h1>
+                <p style="color: #64748b; margin: 0;">Bienvenido, {{ session['user_name'] }}</p>
+            </div>
             <span id="fecha" style="font-weight: 600; color: var(--primary);"></span>
         </div>
 
@@ -66,13 +81,15 @@
             <div class="stat-card">
                 <i class="fas fa-tshirt"></i>
                 <h3>{{ productos|length }}</h3>
-                <p>Productos Activos</p>
+                <p>Tus Productos</p>
             </div>
+            {% if session['es_admin'] %}
             <div class="stat-card">
-                <i class="fas fa-user-friends"></i>
+                <i class="fas fa-store"></i>
                 <h3>{{ usuarios|length }}</h3>
-                <p>Clientes Totales</p>
+                <p>Vendedores Totales</p>
             </div>
+            {% endif %}
         </div>
 
         <div class="glass-card" id="inventario">
@@ -83,21 +100,23 @@
                     <input type="number" name="precio" placeholder="Precio (COP)" required>
                 </div>
                 
-                <select name="categoria" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <select name="categoria" required>
+                    <option value="" disabled selected>Selecciona una categoría</option>
                     <option value="Caballero">Caballero</option>
                     <option value="Dama">Dama</option>
                     <option value="Accesorios">Accesorios</option>
+                    <option value="Calzado">Calzado</option>
                 </select> 
                 
                 <textarea name="descripcion" placeholder="Detalles (Tallas, colores, material...)" rows="3" required></textarea>
-                <label style="font-size: 0.8rem; color: #64748b;">Imagen del producto:</label>
+                <label style="font-size: 0.8rem; color: #64748b; display: block; margin-top: 10px;">Imagen del producto:</label>
                 <input type="file" name="foto" accept="image/*" required>
-                <button type="submit">Publicar Producto</button>
+                <button type="submit">Publicar Producto en la Tienda</button>
             </form>
         </div>
 
         <div class="glass-card" id="gestion-inventario">
-            <h3><i class="fas fa-tasks" style="color: #f59e0b;"></i> Gestionar Inventario</h3>
+            <h3><i class="fas fa-tasks" style="color: #f59e0b;"></i> Gestionar tus Productos</h3>
             <table>
                 <thead>
                     <tr>
@@ -111,11 +130,14 @@
                     {% for p in productos %}
                     <tr>
                         <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="img-preview" onerror="this.src='https://via.placeholder.com/50'"></td>
-                        <td><strong>{{ p.nombre }}</strong></td>
+                        <td>
+                            <strong>{{ p.nombre }}</strong><br>
+                            <small style="color: #64748b;">{{ p.categoria }}</small>
+                        </td>
                         <td>${{ "{:,.0f}".format(p.precio) }}</td>
                         <td style="text-align: center;">
                             <a href="{{ url_for('eliminar_producto', id=p.id) }}" 
-                               onclick="return confirm('¿Segura que quieres eliminar este producto?')" 
+                               onclick="return confirm('¿Seguro que quieres borrar este producto?')" 
                                class="btn-delete">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
@@ -126,24 +148,27 @@
             </table>
         </div>
 
+        {% if session['es_admin'] %}
         <div class="glass-card" id="clientes">
-            <h3><i class="fas fa-users" style="color: var(--success);"></i> Clientes Registrados</h3>
+            <h3><i class="fas fa-users" style="color: var(--success);"></i> Vendedores de Sabanalarga</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>Correo Electrónico</th>
-                        <th>Tipo</th>
+                        <th>Negocio</th>
+                        <th>WhatsApp</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for u in usuarios %}
                     <tr>
                         <td><strong>{{ u.nombre }}</strong></td>
+                        <td><a href="https://wa.me/57{{ u.telefono }}" target="_blank" style="color: var(--primary); text-decoration: none;">{{ u.telefono }}</a></td>
                         <td>{{ u.correo }}</td>
                         <td>
-                            <span style="padding: 4px 8px; border-radius: 5px; font-size: 0.8rem; background: {{ '#dcfce7' if not u.es_admin else '#dbeafe' }}; color: {{ '#166534' if not u.es_admin else '#1e40af' }};">
-                                {{ 'Administrador' if u.es_admin else 'Cliente' }}
+                            <span style="padding: 4px 8px; border-radius: 5px; font-size: 0.8rem; background: {{ '#dbeafe' if u.es_admin else '#f1f5f9' }}; color: {{ '#1e40af' if u.es_admin else '#475569' }};">
+                                {{ 'Super Admin' if u.es_admin else 'Vendedor' }}
                             </span>
                         </td>
                     </tr>
@@ -151,6 +176,7 @@
                 </tbody>
             </table>
         </div>
+        {% endif %}
     </div>
 
     <script>
