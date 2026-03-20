@@ -1,21 +1,27 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.secret_key = 'sabanalarga_pro_key'
+app.secret_key = 'sabanalarga_market_ultra_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
+# Asegurar que la carpeta de fotos exista
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
 db = SQLAlchemy(app)
 
-# --- MODELOS ---
+# --- MODELOS DE BASE DE DATOS ---
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
     correo = db.Column(db.String(100), unique=True, nullable=False)
-    telefono = db.Column(db.String(20)) # Para el WhatsApp
+    telefono = db.Column(db.String(20))
     password = db.Column(db.String(200), nullable=False)
     es_admin = db.Column(db.Boolean, default=False)
     productos = db.relationship('Producto', backref='vendedor', lazy=True)
@@ -28,18 +34,23 @@ class Producto(db.Model):
     descripcion = db.Column(db.Text)
     categoria = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    comentarios = db.relationship('Comentario', backref='producto', lazy=True, cascade="all, delete-orphan")
 
-class Comentario(db.Model):
+class Mensaje(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     contenido = db.Column(db.Text, nullable=False)
-    cliente = db.Column(db.String(100), default="Cliente interesado")
-    producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    emisor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    receptor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'))
+    
+    emisor = db.relationship('User', foreign_keys=[emisor_id])
+    receptor = db.relationship('User', foreign_keys=[receptor_id])
+    producto = db.relationship('Producto')
 
 with app.app_context():
     db.create_all()
 
-# --- RUTAS ---
+# --- RUTAS DE NAVEGACIÓN Y AUTENTICACIÓN ---
 
 @app.route('/')
 def inicio():
@@ -50,9 +61,7 @@ def inicio():
 def registro():
     if request.method == 'POST':
         correo = request.form['correo']
-        # Si eres tú, te hace Admin automáticamente
         es_gleider = True if correo.lower() == 'gleiderr99@gmail.com' else False
-        
         nuevo_u = User(
             nombre=request.form['nombre'],
             correo=correo,
@@ -77,13 +86,19 @@ def login():
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
             return redirect(url_for('gleider_admin'))
-        return "Error en datos. <a href='/login'>Reintentar</a>"
+        return "Datos incorrectos. <a href='/login'>Volver</a>"
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('inicio'))
+
+# --- RUTAS DEL PANEL ADMINISTRATIVO ---
 
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
     if 'user_id' not in session: return redirect(url_for('login'))
-    
     user = User.query.get(session['user_id'])
     
     if request.method == 'POST':
@@ -103,7 +118,9 @@ def gleider_admin():
             db.session.commit()
             return redirect(url_for('gleider_admin'))
 
-    # Tú ves todo, los vendedores solo lo suyo
+    # Lógica para mostrar mensajes recibidos
+    mensajes_recibidos = Mensaje.query.filter_by(receptor_id=user.id).order_by(Mensaje.fecha.desc()).all()
+
     if user.es_admin:
         productos = Producto.query.all()
         usuarios = User.query.all()
@@ -111,18 +128,7 @@ def gleider_admin():
         productos = Producto.query.filter_by(user_id=user.id).all()
         usuarios = []
         
-    return render_template('admin.html', productos=productos, usuarios=usuarios, user=user)
-
-@app.route('/comentar/<int:p_id>', methods=['POST'])
-def comentar(p_id):
-    nuevo_c = Comentario(
-        contenido=request.form.get('comentario'),
-        cliente=request.form.get('nombre_cliente'),
-        producto_id=p_id
-    )
-    db.session.add(nuevo_c)
-    db.session.commit()
-    return redirect(url_for('inicio'))
+    return render_template('admin.html', productos=productos, usuarios=usuarios, user=user, mensajes=mensajes_recibidos)
 
 @app.route('/eliminar/<int:id>')
 def eliminar_producto(id):
@@ -132,10 +138,38 @@ def eliminar_producto(id):
         db.session.commit()
     return redirect(url_for('gleider_admin'))
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('inicio'))
+# --- RUTAS DEL SISTEMA DE CHAT ---
+
+@app.route('/enviar_mensaje/<int:p_id>', methods=['POST'])
+def enviar_mensaje(p_id):
+    if 'user_id' not in session: return redirect(url_for('login'))
+    
+    prod = Producto.query.get(p_id)
+    contenido = request.form.get('mensaje')
+    
+    if contenido:
+        nuevo_m = Mensaje(
+            contenido=contenido,
+            emisor_id=session['user_id'],
+            receptor_id=prod.user_id,
+            producto_id=p_id
+        )
+        db.session.add(nuevo_m)
+        db.session.commit()
+    return redirect(url_for('chat', user_b=prod.user_id))
+
+@app.route('/chat/<int:user_b>')
+def chat(user_b):
+    if 'user_id' not in session: return redirect(url_for('login'))
+    user_a = session['user_id']
+    
+    mensajes = Mensaje.query.filter(
+        ((Mensaje.emisor_id == user_a) & (Mensaje.receptor_id == user_b)) |
+        ((Mensaje.emisor_id == user_b) & (Mensaje.receptor_id == user_a))
+    ).order_by(Mensaje.fecha.asc()).all()
+    
+    otro_usuario = User.query.get(user_b)
+    return render_template('chat.html', mensajes=mensajes, otro=otro_usuario)
 
 if __name__ == '__main__':
     app.run(debug=True)
