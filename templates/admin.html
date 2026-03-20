@@ -21,10 +21,10 @@
         .glass-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px; }
         
         /* Formulario */
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; box-sizing: border-box; }
         button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; }
 
-        /* Estilo de Mensajes en el Panel */
+        /* Estilo de Mensajes */
         .msg-item { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 15px; background: #f8fafc; border-radius: 12px; 
@@ -32,6 +32,7 @@
             text-decoration: none; color: inherit; transition: 0.2s;
         }
         .msg-item:hover { background: #f1f5f9; transform: translateX(5px); }
+        .unread-dot { background: #ef4444; width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 10px; }
 
         /* Tablas */
         table { width: 100%; border-collapse: collapse; }
@@ -39,9 +40,9 @@
         .img-preview { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
 
         @media (max-width: 768px) {
-            .sidebar { width: 60px; padding: 10px; }
+            .sidebar { width: 70px; padding: 10px; }
             .sidebar h2, .nav-link span { display: none; }
-            .main-content { margin-left: 60px; padding: 15px; }
+            .main-content { margin-left: 70px; padding: 15px; }
         }
     </style>
 </head>
@@ -66,22 +67,23 @@
 
         <div class="glass-card" id="mensajes">
             <h3><i class="fas fa-envelope"></i> Mensajes de Clientes</h3>
-            {% for m in mensajes %}
-<a href="/chat/{{ m.emisor_id }}" class="msg-item" style="display: flex; justify-content: space-between; align-items: center; position: relative;">
-    <div>
-        <strong>{{ m.emisor.nombre }}</strong>
-        <p style="margin: 0; font-size: 0.8rem; color: #64748b;">{{ m.contenido[:30] }}...</p>
-    </div>
-    
-    {% if not m.leido %}
-        <span style="background: #ef4444; width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 10px;"></span>
-    {% endif %}
-    
-    <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
-</a>
-{% endfor %}
+            {% if mensajes %}
+                {% for m in mensajes %}
+                <a href="/chat/{{ m.emisor_id }}" class="msg-item">
+                    <div>
+                        <strong>{{ m.emisor.nombre }}</strong>
+                        <p style="margin: 0; font-size: 0.8rem; color: #64748b;">{{ m.contenido[:40] }}...</p>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        {% if not m.leido %}
+                            <span class="unread-dot"></span>
+                        {% endif %}
+                        <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+                    </div>
+                </a>
+                {% endfor %}
             {% else %}
-                <p style="color: #94a3b8; text-align: center;">No tienes mensajes nuevos todavía.</p>
+                <p style="color: #94a3b8; text-align: center; padding: 20px;">No tienes mensajes nuevos todavía.</p>
             {% endif %}
         </div>
 
@@ -95,6 +97,7 @@
                     <option value="Calzado">Calzado</option>
                     <option value="Accesorios">Accesorios</option>
                     <option value="Comida">Comida / Emprendimiento</option>
+                    <option value="Servicios">Servicios</option>
                 </select>
                 <textarea name="descripcion" placeholder="Descripción breve..." rows="2" required></textarea>
                 <input type="file" name="foto" accept="image/*" required>
@@ -104,53 +107,57 @@
 
         <div class="glass-card" id="productos">
             <h3><i class="fas fa-boxes"></i> Tu Inventario</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in productos %}
-                    <tr>
-                        <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="img-preview"></td>
-                        <td>{{ p.nombre }}</td>
-                        <td>${{ "{:,.0f}".format(p.precio) }}</td>
-                        <td>
-                            <a href="/eliminar/{{ p.id }}" style="color: var(--danger);" onclick="return confirm('¿Eliminar producto?')">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in productos %}
+                        <tr>
+                            <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="img-preview" onerror="this.src='https://via.placeholder.com/50'"></td>
+                            <td>{{ p.nombre }}</td>
+                            <td>${{ "{:,.0f}".format(p.precio) }}</td>
+                            <td>
+                                <a href="/eliminar/{{ p.id }}" style="color: var(--danger);" onclick="return confirm('¿Seguro que quieres eliminar este producto?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {% if user.es_admin %}
         <div class="glass-card" id="vendedores">
-            <h3><i class="fas fa-users"></i> Control de Vendedores</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>WhatsApp</th>
-                        <th>Correo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in usuarios %}
-                    <tr>
-                        <td>{{ u.nombre }}</td>
-                        <td>{{ u.telefono }}</td>
-                        <td>{{ u.correo }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h3><i class="fas fa-users"></i> Control de Vendedores (Admin)</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>WhatsApp / Tel</th>
+                            <th>Correo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in usuarios %}
+                        <tr>
+                            <td>{{ u.nombre }}</td>
+                            <td>{{ u.telefono }}</td>
+                            <td>{{ u.correo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% endif %}
     </div>
