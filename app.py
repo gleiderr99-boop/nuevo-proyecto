@@ -1,12 +1,13 @@
+import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-import os
 
 app = Flask(__name__)
 app.secret_key = 'sabanalarga_market_ultra_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Asegurar que la carpeta de fotos exista
@@ -43,6 +44,7 @@ class Mensaje(db.Model):
     receptor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'))
     leido = db.Column(db.Boolean, default=False)
+    
     emisor = db.relationship('User', foreign_keys=[emisor_id])
     receptor = db.relationship('User', foreign_keys=[receptor_id])
     producto = db.relationship('Producto')
@@ -50,35 +52,28 @@ class Mensaje(db.Model):
 with app.app_context():
     db.create_all()
 
-# --- RUTAS DE NAVEGACIÓN Y AUTENTICACIÓN ---
+# --- RUTAS ---
 
-# Reemplaza la ruta de inicio y añade el modelo de mensajes leídos
 @app.route('/')
 def inicio():
-    query = request.args.get('q') # Captura lo que la gente escribe en el buscador
+    query = request.args.get('q')
     if query:
-        # Busca productos que contengan esa palabra en el nombre
         productos = Producto.query.filter(Producto.nombre.contains(query)).all()
     else:
         productos = Producto.query.all()
     return render_template('index.html', productos=productos)
 
-# Añade esto a tu clase Mensaje para las notificaciones
-# class Mensaje(db.Model):
-#    ... (lo que ya tenías)
-#    leido = db.Column(db.Boolean, default=False)
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        correo = request.form['correo']
-        tipo = request.form.get('tipo_usuario') # 'cliente' o 'vendedor'
-        
-        # El admin siempre es Gleider
-        es_gleider = True if correo.lower() == 'gleiderr99@gmail.com' else False
-        
-        # Si es cliente, el teléfono será "Cliente", si es vendedor, lo que ponga en el input
+        correo = request.form['correo'].lower()
+        tipo = request.form.get('tipo_usuario')
+        es_gleider = True if correo == 'gleiderr99@gmail.com' else False
         tel_final = request.form.get('telefono') if tipo == 'vendedor' else "Cliente"
         
+        if User.query.filter_by(correo=correo).first():
+            return "El correo ya existe. <a href='/login'>Inicia sesión</a>"
+
         nuevo_u = User(
             nombre=request.form['nombre'],
             correo=correo,
@@ -86,42 +81,38 @@ def registro():
             password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'),
             es_admin=es_gleider
         )
-        try:
-            db.session.add(nuevo_u)
-            db.session.commit()
-            return redirect(url_for('login'))
-        except:
-            return "El correo ya existe. <a href='/login'>Inicia sesión</a>"
+        db.session.add(nuevo_u)
+        db.session.commit()
+        return redirect(url_for('login'))
     return render_template('registro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Buscamos al usuario por correo
-        user = User.query.filter_by(correo=request.form['correo']).first()
-        
-        # Si el usuario existe y la clave es correcta
+        user = User.query.filter_by(correo=request.form['correo'].lower()).first()
         if user and check_password_hash(user.password, request.form['pass']):
             session['user_id'] = user.id
             session['user_name'] = user.nombre
             session['es_admin'] = user.es_admin
             
-            # Redirección inteligente
             if user.es_admin or (user.telefono and user.telefono != "Cliente"):
                 return redirect(url_for('gleider_admin'))
-            else:
-                return redirect(url_for('inicio'))
-        
-        # Si falla, manda un mensaje claro
+            return redirect(url_for('inicio'))
         return "Correo o contraseña incorrectos. <a href='/login'>Intentar de nuevo</a>"
     return render_template('login.html')
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('inicio'))
-
-# --- RUTAS DEL PANEL ADMINISTRATIVO ---
+@app.route('/recuperar', methods=['GET', 'POST'])
+def recuperar():
+    if request.method == 'POST':
+        correo = request.form['correo'].lower()
+        nueva_pass = request.form['nueva_pass']
+        user = User.query.filter_by(correo=correo).first()
+        if user:
+            user.password = generate_password_hash(nueva_pass, method='pbkdf2:sha256')
+            db.session.commit()
+            return "Contraseña actualizada. <a href='/login'>Inicia sesión aquí</a>"
+        return "El correo no está registrado. <a href='/registro'>Crea una cuenta</a>"
+    return render_template('recuperar.html')
 
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
@@ -145,17 +136,56 @@ def gleider_admin():
             db.session.commit()
             return redirect(url_for('gleider_admin'))
 
-    # Lógica para mostrar mensajes recibidos
-    mensajes_recibidos = Mensaje.query.filter_by(receptor_id=user.id).order_by(Mensaje.fecha.desc()).all()
-
+    mensajes = Mensaje.query.filter_by(receptor_id=user.id).order_by(Mensaje.fecha.desc()).all()
     if user.es_admin:
         productos = Producto.query.all()
         usuarios = User.query.all()
     else:
         productos = Producto.query.filter_by(user_id=user.id).all()
         usuarios = []
-        
-    return render_template('admin.html', productos=productos, usuarios=usuarios, user=user, mensajes=mensajes_recibidos)
+    return render_template('admin.html', productos=productos, usuarios=usuarios, user=user, mensajes=mensajes)
+
+@app.route('/chat/<int:user_b>')
+def chat(user_b):
+    if 'user_id' not in session: return redirect(url_for('login'))
+    yo = session['user_id']
+    
+    # Marcar mensajes como leídos al entrar al chat
+    Mensaje.query.filter_by(receptor_id=yo, emisor_id=user_b, leido=False).update({Mensaje.leido: True})
+    db.session.commit()
+
+    mensajes = Mensaje.query.filter(
+        ((Mensaje.emisor_id == yo) & (Mensaje.receptor_id == user_b)) |
+        ((Mensaje.emisor_id == user_b) & (Mensaje.receptor_id == yo))
+    ).order_by(Mensaje.fecha.asc()).all()
+    
+    otro_usuario = User.query.get(user_b)
+    return render_template('chat.html', mensajes=mensajes, otro=otro_usuario)
+
+@app.route('/enviar_mensaje/<int:p_id>', methods=['POST'])
+def enviar_mensaje(p_id):
+    if 'user_id' not in session: return redirect(url_for('login'))
+    prod = Producto.query.get(p_id)
+    emisor_id = session['user_id']
+    
+    # Si soy el dueño del producto, respondo al cliente (receptor_id viene del form)
+    if emisor_id == prod.user_id:
+        receptor_id = request.form.get('receptor_id')
+    else:
+        # Si soy el cliente, le escribo al dueño
+        receptor_id = prod.user_id
+
+    if receptor_id:
+        nuevo_m = Mensaje(
+            contenido=request.form.get('mensaje'),
+            emisor_id=emisor_id,
+            receptor_id=int(receptor_id),
+            producto_id=p_id
+        )
+        db.session.add(nuevo_m)
+        db.session.commit()
+        return redirect(url_for('chat', user_b=receptor_id))
+    return redirect(url_for('inicio'))
 
 @app.route('/eliminar/<int:id>')
 def eliminar_producto(id):
@@ -165,65 +195,11 @@ def eliminar_producto(id):
         db.session.commit()
     return redirect(url_for('gleider_admin'))
 
-# --- RUTAS DEL SISTEMA DE CHAT ---
-
-@app.route('/enviar_mensaje/<int:p_id>', methods=['POST'])
-def enviar_mensaje(p_id):
-    if 'user_id' not in session: return redirect(url_for('login'))
-    
-    prod = Producto.query.get(p_id)
-    contenido = request.form.get('mensaje')
-    emisor_id = session['user_id']
-    
-    # LÓGICA INTELIGENTE DE RECEPTOR:
-    # Si el que escribe NO es el dueño, el mensaje va para el dueño (Vendedor).
-    if emisor_id != prod.user_id:
-        receptor_id = prod.user_id
-    else:
-        # Si el que escribe ES el dueño, necesitamos saber a qué cliente le responde.
-        # Para simplificar, lo sacamos de la URL del chat donde está parado.
-        receptor_id = request.form.get('receptor_id') 
-
-    if contenido and receptor_id:
-        nuevo_m = Mensaje(
-            contenido=contenido,
-            emisor_id=emisor_id,
-            receptor_id=int(receptor_id),
-            producto_id=p_id
-        )
-        db.session.add(nuevo_m)
-        db.session.commit()
-        return redirect(url_for('chat', user_b=receptor_id))
-    
+@app.route('/logout')
+def logout():
+    session.clear()
     return redirect(url_for('inicio'))
 
-@app.route('/chat/<int:user_b>')
-def chat(user_b):
-    if 'user_id' not in session: return redirect(url_for('login'))
-    user_a = session['user_id']
-    
-    mensajes = Mensaje.query.filter(
-        ((Mensaje.emisor_id == user_a) & (Mensaje.receptor_id == user_b)) |
-        ((Mensaje.emisor_id == user_b) & (Mensaje.receptor_id == user_a))
-    ).order_by(Mensaje.fecha.asc()).all()
-    
-    otro_usuario = User.query.get(user_b)
-    return render_template('chat.html', mensajes=mensajes, otro=otro_usuario)
-    
- @app.route('/recuperar', methods=['GET', 'POST'])
- def recuperar():
-    if request.method == 'POST':
-        correo = request.form['correo']
-        nueva_pass = request.form['nueva_pass']
-        user = User.query.filter_by(correo=correo).first()
-        if user:
-            from hash src import generate_password_hash # Asegúrate de tener esta importación arriba
-            user.password = generate_password_hash(nueva_pass, method='pbkdf2:sha256')
-            db.session.commit()
-            return "Contraseña actualizada con éxito. <a href='/login'>Inicia sesión aquí</a>"
-        return "El correo no está registrado. <a href='/registro'>Crea una cuenta</a>"
-    return render_template('recuperar.html')
 if __name__ == '__main__':
-    # Render asigna un puerto automáticamente, por eso usamos os.environ.get
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
