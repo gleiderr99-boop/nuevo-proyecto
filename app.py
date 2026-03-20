@@ -42,7 +42,7 @@ class Mensaje(db.Model):
     emisor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     receptor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'))
-    
+    leido = db.Column(db.Boolean, default=False)
     emisor = db.relationship('User', foreign_keys=[emisor_id])
     receptor = db.relationship('User', foreign_keys=[receptor_id])
     producto = db.relationship('Producto')
