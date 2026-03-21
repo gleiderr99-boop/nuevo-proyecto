@@ -7,11 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; --white: #ffffff; }
+        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; --white: #ffffff; --perfil: #6366f1; }
         
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; overflow-x: hidden; }
         
-        /* Navbar de Lujo */
+        /* Navbar */
         nav { 
             background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(15px); 
@@ -60,21 +60,36 @@
         }
         .card:hover { transform: translateY(-15px); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
         
-        .img-container { width: 100%; height: 250px; overflow: hidden; position: relative; }
+        .img-container { width: 100%; height: 250px; overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center;}
         .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s ease; }
         .card:hover img { transform: scale(1.15); }
+
+        /* Estilo para cuando no hay foto pero hay video */
+        .no-photo-msg { color: white; text-align: center; font-weight: 700; }
+        .no-photo-msg i { font-size: 3rem; margin-bottom: 10px; display: block; color: var(--accent); }
 
         .badge { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 6px 15px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; color: var(--primary); z-index: 2; }
 
         .content { padding: 25px; }
         .price { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
         
+        /* Botones de acción */
+        .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+
         .btn-view { 
             background: #f1f5f9; color: var(--primary); text-decoration: none; 
-            display: flex; align-items: center; justify-content: center; 
-            padding: 14px; border-radius: 18px; font-weight: 800; margin-top: 15px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px; border-radius: 15px; font-weight: 800; transition: 0.3s;
         }
         .btn-view:hover { background: var(--primary); color: white; }
+
+        .btn-perfil-vendedor {
+            background: #eff6ff; color: var(--perfil); text-decoration: none;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px; border-radius: 15px; font-weight: 800; transition: 0.3s;
+            border: 1px solid #dbeafe;
+        }
+        .btn-perfil-vendedor:hover { background: var(--perfil); color: white; }
 
         .empty { grid-column: 1/-1; text-align: center; padding: 100px 20px; }
     </style>
@@ -121,17 +136,39 @@
                     {% else %}<i class="fas fa-star"></i>{% endif %}
                     {{ p.categoria | upper }}
                 </div>
-                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+                
+                {% if p.imagen %}
+                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+                {% elif p.video %}
+                    <div class="no-photo-msg">
+                        <i class="fas fa-play-circle"></i>
+                        VÍDEO DISPONIBLE
+                    </div>
+                {% else %}
+                    <div class="no-photo-msg">
+                        <i class="fas fa-image"></i>
+                        SIN PREVIA
+                    </div>
+                {% endif %}
             </div>
+
             <div class="content">
                 <h3 style="margin:0; font-size: 1.3rem;">{{ p.nombre }}</h3>
                 <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
-                <div style="display:flex; align-items:center; gap:8px; color:#64748b; font-size: 0.9rem; margin-bottom: 15px;">
+                
+                <div style="display:flex; align-items:center; gap:8px; color:#64748b; font-size: 0.9rem; margin-bottom: 5px;">
                     <i class="fas fa-store"></i> {{ p.vendedor.nombre if p.vendedor else 'Vendedor' }}
                 </div>
-                <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-view">
-                    <i class="fas fa-eye"></i> Ver Detalles y Video
-                </a>
+
+                <div class="actions">
+                    <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-view">
+                        <i class="fas fa-comment-dots"></i> Comentarios y Video
+                    </a>
+
+                    <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-perfil-vendedor">
+                        <i class="fas fa-user-circle"></i> Ver Perfil Vendedor
+                    </a>
+                </div>
             </div>
         </div>
         {% else %}
