@@ -2,53 +2,114 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Panel | Sabanalarga</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control | Sabanalarga Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; margin: 0; min-height: 100vh; }
-        .sidebar { width: 300px; background: white; padding: 20px; border-right: 1px solid #ddd; }
-        .main { flex: 1; padding: 40px; }
-        .card-msg { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #2563eb; text-decoration: none; display: block; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .form-card { background: white; padding: 20px; border-radius: 15px; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
+        :root { --primary: #2563eb; --dark: #1e293b; --bg: #f1f5f9; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        
+        /* Sidebar Azul */
+        .sidebar { width: 280px; background: var(--primary); color: white; min-height: 100vh; padding: 20px; position: fixed; }
+        .sidebar h2 { font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .side-link { color: white; text-decoration: none; display: block; padding: 12px; border-radius: 10px; margin-bottom: 5px; transition: 0.3s; font-weight: 600; }
+        .side-link:hover { background: rgba(255,255,255,0.1); }
+        .msg-card { background: rgba(255,255,255,0.15); padding: 10px; border-radius: 10px; margin-bottom: 10px; display: block; color: white; text-decoration: none; font-size: 0.9rem; }
+
+        /* Contenido Principal */
+        .main { margin-left: 280px; padding: 40px; width: 100%; }
+        .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        .grid-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        /* Formulario y Inputs */
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; }
+        .btn-post { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 800; cursor: pointer; }
+
+        /* Lista de Productos con FOTO */
+        .prod-item { display: flex; align-items: center; gap: 15px; background: #f8fafc; padding: 10px; border-radius: 15px; margin-bottom: 10px; }
+        .prod-item img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
+        .btn-del { color: #ef4444; background: none; border: none; cursor: pointer; }
+
+        /* Usuarios Registrados (Solo Admin) */
+        .user-tag { display: inline-block; background: #e2e8f0; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin: 3px; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Mis Chats</h2>
+        <h2>S. MARKET</h2>
+        <p style="font-size: 0.8rem; opacity: 0.8;">Panel de {{ user.nombre }}</p>
+        <a href="/" class="side-link"><i class="fas fa-store"></i> Ir a la Tienda</a>
+        
+        <h3 style="margin-top: 30px; font-size: 1rem;">MENSAJES RECIENTES</h3>
         {% for m in mensajes %}
-            <a href="/chat/{{ m.emisor_id if m.emisor_id != session['user_id'] else m.receptor_id }}" class="card-msg">
+            <a href="/chat/{{ m.emisor_id if m.emisor_id != session['user_id'] else m.receptor_id }}" class="msg-card">
                 <strong>{{ m.emisor.nombre if m.emisor_id != session['user_id'] else m.receptor.nombre }}</strong>
-                <p style="margin:0; font-size:0.8rem; color:#666;">Haz clic para chatear</p>
+                <p style="margin: 3px 0; font-size: 0.75rem; opacity: 0.9;">Clic para responder...</p>
             </a>
         {% endfor %}
-        <hr>
-        <a href="/" style="display:block; margin-bottom:10px; text-decoration:none; color:blue;">Ir al Inicio</a>
-        <a href="/logout" style="color:red; text-decoration:none;">Cerrar Sesión</a>
+
+        <a href="/logout" class="side-link" style="margin-top: 50px; color: #ff9999;"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
     </div>
 
     <div class="main">
-        <h1>¡Hola, {{ user.nombre }}!</h1>
-        {% if user.telefono != "Cliente" %}
-        <div class="form-card">
-            <h3>Publicar nuevo producto</h3>
-            <form method="POST" enctype="multipart/form-data">
-                <input type="text" name="nombre" placeholder="Nombre del producto" required>
-                <input type="number" name="precio" placeholder="Precio ($)" required>
-                <select name="categoria">
-                    <option>Comida</option><option>Moda</option><option>Servicios</option><option>Otros</option>
-                </select>
-                <textarea name="descripcion" placeholder="Descripción corta..."></textarea>
-                <label>Foto (Requerida):</label>
-                <input type="file" name="foto" accept="image/*" required>
-                <label>Video Promocional (Opcional):</label>
-                <input type="file" name="video" accept="video/*">
-                <button type="submit" class="btn">Subir Producto</button>
-            </form>
+        <div class="header-main">
+            <h1>Panel de Control</h1>
+            <div style="background: white; padding: 10px 20px; border-radius: 50px; font-weight: 700; color: var(--primary);">
+                <i class="fas fa-user-circle"></i> {{ user.nombre }}
+            </div>
         </div>
-        {% else %}
-            <p>Estás en modo cliente. Aquí verás tus mensajes con vendedores.</p>
-        {% endif %}
+
+        <div class="grid-admin">
+            <div class="card">
+                <h3 style="margin-top:0"><i class="fas fa-plus-circle"></i> Subir Producto</h3>
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="text" name="nombre" placeholder="¿Qué vendes?" required>
+                    <input type="number" name="precio" placeholder="Precio ($)" required>
+                    <select name="categoria">
+                        <option>Comida</option><option>Moda</option><option>Servicios</option><option>Otros</option>
+                    </select>
+                    <textarea name="descripcion" placeholder="Descripción del producto..."></textarea>
+                    
+                    <p style="font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">FOTO DEL PRODUCTO</p>
+                    <input type="file" name="foto" accept="image/*" required>
+                    
+                    <p style="font-size: 0.8rem; font-weight: 700; margin-bottom: 5px;">VIDEO (OPCIONAL)</p>
+                    <input type="file" name="video" accept="video/*">
+                    
+                    <button type="submit" class="btn-post">PUBLICAR AHORA</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0"><i class="fas fa-box"></i> Mis Productos</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for p in productos %}
+                    <div class="prod-item">
+                        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+                        <div style="flex: 1;">
+                            <strong style="display:block;">{{ p.nombre }}</strong>
+                            <span style="color: var(--primary); font-weight: 700;">${{ "{:,.0f}".format(p.precio) }}</span>
+                        </div>
+                        <a href="/eliminar/{{ p.id }}" class="btn-del" onclick="return confirm('¿Eliminar producto?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if user.es_admin %}
+                <h3 style="margin-top:30px;"><i class="fas fa-users"></i> Personas Registradas</h3>
+                <div style="background: #f8fafc; padding: 10px; border-radius: 15px;">
+                    {% for u in usuarios %}
+                        <span class="user-tag">{{ u.nombre }} ({{ u.telefono }})</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </body>
 </html>
