@@ -109,9 +109,12 @@ def gleider_admin():
     for m in mensajes:
         otro_id = m.emisor_id if m.emisor_id != user.id else m.receptor_id
         if otro_id not in chats_vistos: mensajes_unicos.append(m); chats_vistos.append(otro_id)
-    
+    # Al final de la función gleider_admin en app.py:
     productos = Producto.query.filter_by(user_id=user.id).all()
-    return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos)
+    # ESTO ES LO QUE TRAE A TODAS LAS PERSONAS SI ERES ADMIN
+    usuarios = User.query.all() if user.es_admin else [] 
+    
+    return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos, usuarios=usuarios)
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
