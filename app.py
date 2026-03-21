@@ -6,12 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'sabanalarga_market_ultra_key')
-
-# Configuración de base de datos para Render
-# Usamos un path absoluto para evitar errores de escritura en Render
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tienda.db')
+app.secret_key = 'sabanalarga_market_ultra_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
@@ -20,7 +16,6 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 db = SQLAlchemy(app)
 
-# --- MODELOS --- (Se mantienen igual)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
@@ -63,7 +58,6 @@ class Comentario(db.Model):
 with app.app_context():
     db.create_all()
 
-# --- RUTAS --- (Se mantienen igual)
 @app.route('/')
 def inicio():
     query = request.args.get('q')
@@ -77,8 +71,7 @@ def registro():
         tipo = request.form.get('tipo_usuario')
         es_gleider = (correo == 'gleiderr99@gmail.com')
         tel_final = request.form.get('telefono') if tipo == 'vendedor' else "Cliente"
-        if User.query.filter_by(correo=correo).first():
-            return "Correo ya existe."
+        if User.query.filter_by(correo=correo).first(): return "Correo ya existe."
         nuevo_u = User(nombre=request.form['nombre'], correo=correo, telefono=tel_final,
                      password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'), es_admin=es_gleider)
         db.session.add(nuevo_u); db.session.commit()
@@ -98,63 +91,57 @@ def login():
 def gleider_admin():
     if 'user_id' not in session: return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
-    
     if request.method == 'POST' and user.telefono != "Cliente":
-        foto = request.files.get('foto')
-        video = request.files.get('video')
-        f_foto, f_video = "", ""
-        if foto and foto.filename != '':
-            f_foto = secure_filename(foto.filename)
-            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], f_foto))
-        if video and video.filename != '':
-            f_video = secure_filename(video.filename)
-            video.save(os.path.join(app.config['UPLOAD_FOLDER'], f_video))
-
+        f, v = request.files.get('foto'), request.files.get('video')
+        fn_f, fn_v = "", ""
+        if f and f.filename != '':
+            fn_f = secure_filename(f.filename); f.save(os.path.join(app.config['UPLOAD_FOLDER'], fn_f))
+        if v and v.filename != '':
+            fn_v = secure_filename(v.filename); v.save(os.path.join(app.config['UPLOAD_FOLDER'], fn_v))
         nuevo = Producto(nombre=request.form.get('nombre'), precio=float(request.form.get('precio', 0)),
                         descripcion=request.form.get('descripcion'), categoria=request.form.get('categoria'),
-                        imagen=f_foto, video=f_video, user_id=user.id)
+                        imagen=fn_f, video=fn_v, user_id=user.id)
         db.session.add(nuevo); db.session.commit()
         return redirect(url_for('gleider_admin'))
-
+    
     mensajes = Mensaje.query.filter((Mensaje.emisor_id==user.id)|(Mensaje.receptor_id==user.id)).order_by(Mensaje.fecha.desc()).all()
     chats_vistos, mensajes_unicos = [], []
     for m in mensajes:
         otro_id = m.emisor_id if m.emisor_id != user.id else m.receptor_id
-        if otro_id not in chats_vistos:
-            mensajes_unicos.append(m); chats_vistos.append(otro_id)
-
+        if otro_id not in chats_vistos: mensajes_unicos.append(m); chats_vistos.append(otro_id)
+    
     productos = Producto.query.filter_by(user_id=user.id).all()
     return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos)
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
-    usuario = User.query.get_or_404(user_id)
-    productos = Producto.query.filter_by(user_id=user_id).all()
-    return render_template('perfil.html', usuario=usuario, productos=productos)
+    u = User.query.get_or_404(user_id)
+    p = Producto.query.filter_by(user_id=user_id).all()
+    return render_template('perfil.html', usuario=u, productos=p)
 
 @app.route('/comentar/<int:p_id>', methods=['POST'])
 def comentar(p_id):
     if 'user_id' not in session: return redirect(url_for('login'))
-    nuevo = Comentario(contenido=request.form.get('comentario'), user_id=session['user_id'], producto_id=p_id)
-    db.session.add(nuevo); db.session.commit()
+    n = Comentario(contenido=request.form.get('comentario'), user_id=session['user_id'], producto_id=p_id)
+    db.session.add(n); db.session.commit()
     return redirect(request.referrer)
 
 @app.route('/chat/<int:user_b>')
 def chat(user_b):
     if 'user_id' not in session: return redirect(url_for('login'))
     yo = session['user_id']
-    mensajes = Mensaje.query.filter(((Mensaje.emisor_id==yo)&(Mensaje.receptor_id==user_b))|((Mensaje.emisor_id==user_b)&(Mensaje.receptor_id==yo))).all()
-    return render_template('chat.html', mensajes=mensajes, otro=User.query.get(user_b))
+    ms = Mensaje.query.filter(((Mensaje.emisor_id==yo)&(Mensaje.receptor_id==user_b))|((Mensaje.emisor_id==user_b)&(Mensaje.receptor_id==yo))).all()
+    return render_template('chat.html', mensajes=ms, otro=User.query.get(user_b))
 
 @app.route('/enviar_mensaje/<int:p_id>', methods=['POST'])
 def enviar_mensaje(p_id):
     if 'user_id' not in session: return redirect(url_for('login'))
-    prod = Producto.query.get(p_id)
-    emisor_id = session['user_id']
-    receptor_id = request.form.get('receptor_id') if emisor_id == prod.user_id else prod.user_id
-    nuevo_m = Mensaje(contenido=request.form.get('mensaje'), emisor_id=emisor_id, receptor_id=int(receptor_id), producto_id=p_id)
-    db.session.add(nuevo_m); db.session.commit()
-    return redirect(url_for('chat', user_b=receptor_id))
+    pr = Producto.query.get(p_id)
+    yo = session['user_id']
+    re = request.form.get('receptor_id') if yo == pr.user_id else pr.user_id
+    nm = Mensaje(contenido=request.form.get('mensaje'), emisor_id=yo, receptor_id=int(re), producto_id=p_id)
+    db.session.add(nm); db.session.commit()
+    return redirect(url_for('chat', user_b=re))
 
 @app.route('/eliminar/<int:id>')
 def eliminar_producto(id):
@@ -165,8 +152,6 @@ def eliminar_producto(id):
 def logout():
     session.clear(); return redirect(url_for('inicio'))
 
-# IMPORTANTE PARA RENDER:
 if __name__ == '__main__':
-    # Render usa la variable de entorno PORT
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
