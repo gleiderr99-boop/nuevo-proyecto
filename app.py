@@ -7,11 +7,10 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# CONFIGURACIÓN DE BASE DE DATOS (Nombre nuevo para evitar errores en Render)
-db_name = 'mercado_final.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_name}'
+# CAMBIO DE NOMBRE DE BD PARA DESBLOQUEAR RENDER
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sabanalarga_v3.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'clave_secreta_sabanalarga_2024'
+app.secret_key = 'llave_maestra_99'
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -54,15 +53,18 @@ with app.app_context():
 # RUTAS
 @app.route('/')
 def inicio():
-    q = request.args.get('q')
-    productos = Producto.query.filter(Producto.nombre.contains(q)).all() if q else Producto.query.all()
-    return render_template('index.html', productos=productos)
+    try:
+        q = request.args.get('q')
+        productos = Producto.query.filter(Producto.nombre.contains(q)).all() if q else Producto.query.all()
+        return render_template('index.html', productos=productos)
+    except:
+        return "Error en Inicio. Por favor, recarga la página."
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
         correo = request.form['correo'].lower().strip()
-        if User.query.filter_by(correo=correo).first(): return "El correo ya existe"
+        if User.query.filter_by(correo=correo).first(): return "Correo ya registrado"
         nuevo = User(nombre=request.form['nombre'], correo=correo, 
                      telefono=request.form.get('telefono', 'Cliente'),
                      password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'),
@@ -100,9 +102,12 @@ def gleider_admin():
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
-    usuario = User.query.get_or_404(user_id)
-    productos = Producto.query.filter_by(user_id=user_id).all()
-    return render_template('perfil.html', usuario=usuario, productos=productos)
+    try:
+        usuario = User.query.get_or_404(user_id)
+        productos = Producto.query.filter_by(user_id=user_id).all()
+        return render_template('perfil.html', usuario=usuario, productos=productos)
+    except Exception as e:
+        return f"Error en Perfil: {str(e)}"
 
 @app.route('/comentar/<int:p_id>', methods=['POST'])
 def comentar(p_id):
@@ -112,16 +117,10 @@ def comentar(p_id):
     db.session.add(nuevo); db.session.commit()
     return redirect(request.referrer)
 
-@app.route('/eliminar/<int:id>')
-def eliminar_producto(id):
-    p = Producto.query.get(id)
-    if p and (p.user_id == session.get('user_id') or session.get('es_admin')):
-        db.session.delete(p); db.session.commit()
-    return redirect(url_for('gleider_admin'))
-
 @app.route('/logout')
 def logout():
     session.clear(); return redirect(url_for('inicio'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
