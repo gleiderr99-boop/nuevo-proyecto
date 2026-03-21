@@ -3,27 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabanalarga Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <title>Sabanalarga Market | Apoya lo Local</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; }
-        nav { background: white; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.4rem; }
-        .nav-btns { display: flex; gap: 10px; }
-        .btn { padding: 8px 15px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: 0.3s; }
-        .btn-sell { background: var(--accent); color: white; }
-        .btn-msg { background: var(--primary); color: white; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; }
+        
+        nav { background: white; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.6rem; letter-spacing: -1px; }
+        
+        .nav-btns { display: flex; gap: 12px; align-items: center; }
+        .btn { padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-sell { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+        .btn-panel { background: var(--primary); color: white; }
         .btn-login { color: #333; border: 1px solid #ddd; }
-        .hero { text-align: center; padding: 40px 20px; }
-        .search-box { max-width: 500px; margin: 20px auto; display: flex; gap: 10px; }
-        .search-box input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 20px 8%; }
-        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .content { padding: 15px; }
-        .btn-chat { background: var(--primary); color: white; text-decoration: none; display: block; text-align: center; padding: 10px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+
+        .hero { text-align: center; padding: 60px 20px; background: white; }
+        .hero h1 { font-size: 2.8rem; margin: 0; color: var(--primary); }
+        .support-msg { color: #64748b; font-size: 1.1rem; margin-top: 10px; font-weight: 600; }
+
+        .search-box { max-width: 600px; margin: 30px auto; display: flex; background: white; padding: 5px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .search-box input { flex: 1; border: none; padding: 15px 20px; border-radius: 15px; outline: none; font-size: 1rem; }
+        .search-box button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 15px; cursor: pointer; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 40px 8%; }
+        
+        /* ZOOM Y DISEÑO DE TARJETA */
+        .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: 0.4s; position: relative; }
+        .card:hover { transform: translateY(-10px); }
+        .img-wrap { width: 100%; height: 230px; overflow: hidden; position: relative; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .card:hover img { transform: scale(1.1); } /* EL ZOOM */
+
+        .cat-tag { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; color: var(--primary); }
+        .content { padding: 20px; }
+        .price { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        .btn-contact { background: #f1f5f9; color: var(--primary); text-decoration: none; display: block; text-align: center; padding: 12px; border-radius: 15px; font-weight: 700; transition: 0.3s; }
+        .btn-contact:hover { background: var(--primary); color: white; }
+
+        .empty-state { text-align: center; grid-column: 1 / -1; padding: 50px; }
     </style>
 </head>
 <body>
@@ -31,31 +50,49 @@
         <a href="/" class="logo">SABANALARGA MKT</a>
         <div class="nav-btns">
             {% if session.get('user_id') %}
-                <a href="/gleider_admin" class="btn btn-msg"><i class="fas fa-comments"></i> Mis Mensajes</a>
-                <a href="/logout" class="btn btn-login">Salir</a>
+                <a href="/gleider_admin" class="btn btn-panel"><i class="fas fa-th-large"></i> Mi Panel</a>
+                <a href="/logout" class="btn btn-login"><i class="fas fa-sign-out-alt"></i></a>
             {% else %}
                 <a href="/login" class="btn btn-login">Entrar</a>
-                <a href="/registro" class="btn btn-sell">Vender Ahora</a>
+                <a href="/registro" class="btn btn-sell"><i class="fas fa-plus-circle"></i> Vender Ahora</a>
             {% endif %}
         </div>
     </nav>
+
     <div class="hero">
-        <h1>Lo mejor de Sabanalarga en un solo lugar</h1>
+        <h1>¡Hola, Sabanalarga!</h1>
+        <p class="support-msg"><i class="fas fa-heart" style="color:#ef4444"></i> Apoyando el emprendimiento de nuestro municipio</p>
         <form action="/" class="search-box">
-            <input type="text" name="q" placeholder="¿Qué buscas hoy?">
-            <button type="submit" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Buscar</button>
+            <input type="text" name="q" placeholder="Buscar zapatos, comida, servicios...">
+            <button type="submit"><i class="fas fa-search"></i></button>
         </form>
     </div>
+
     <div class="grid">
         {% for p in productos %}
         <div class="card">
-            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-            <div class="content">
-                <h3 style="margin: 0;">{{ p.nombre }}</h3>
-                <p style="color: var(--primary); font-weight: 800; font-size: 1.2rem;">${{ "{:,.0f}".format(p.precio) }}</p>
-                <a href="/chat/{{ p.user_id }}" class="btn-chat">Preguntar</a>
-                <a href="/perfil/{{ p.user_id }}" style="display: block; text-align: center; margin-top: 8px; color: #666; font-size: 0.8rem; text-decoration: none;">Ver Perfil del Vendedor</a>
+            <div class="img-wrap">
+                <span class="cat-tag">
+                    {% if p.categoria == 'Comida' %}<i class="fas fa-utensils"></i>
+                    {% elif p.categoria == 'Moda' %}<i class="fas fa-tshirt"></i>
+                    {% else %}<i class="fas fa-tag"></i>{% endif %}
+                    {{ p.categoria }}
+                </span>
+                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
             </div>
+            <div class="content">
+                <h3 style="margin: 0; font-size: 1.2rem;">{{ p.nombre }}</h3>
+                <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;"><i class="fas fa-user"></i> {{ p.vendedor.nombre }}</p>
+                <a href="/perfil/{{ p.user_id }}" class="btn-contact">Ver Detalles</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-store-slash" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 20px;"></i>
+            <h3>¡Aún no hay productos disponibles!</h3>
+            <p>Sé el primero en subir un producto y apoya el comercio local.</p>
+            <a href="/registro" class="btn btn-sell" style="display:inline-flex; margin-top:15px;">Empezar a Vender</a>
         </div>
         {% endfor %}
     </div>
