@@ -2,54 +2,59 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Perfil de {{ usuario.nombre }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <title>Perfil de Vendedor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 650px; margin: 0 auto; }
-        .header { background: white; padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .nav-back { margin-bottom: 15px; display: block; text-decoration: none; color: #2563eb; font-weight: 700; }
-        .post { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-        .media-container { width: 100%; background: #000; display: flex; align-items: center; justify-content: center; min-height: 300px; }
-        video, img { max-width: 100%; max-height: 500px; display: block; }
-        .p-info { padding: 25px; }
-        .price { font-size: 1.8rem; font-weight: 800; color: #2563eb; margin: 10px 0; }
-        .comment-section { padding: 20px; background: #f8fafc; border-top: 1px solid #edf2f7; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .profile-card { background: white; padding: 40px; border-radius: 30px; text-align: center; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .avatar { width: 100px; height: 100px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem; font-weight: 800; }
+        
+        .post { background: white; border-radius: 30px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .media { width: 100%; max-height: 500px; object-fit: cover; background: #000; display: block; }
+        .post-body { padding: 30px; }
+        
+        .btn-msg { background: #2563eb; color: white; padding: 15px 30px; border-radius: 20px; text-decoration: none; font-weight: 800; display: inline-flex; align-items: center; gap: 10px; margin-top: 15px; }
+        .btn-msg:hover { background: #1d4ed8; }
+        
+        .comments { background: #f8fafc; padding: 25px; border-top: 1px solid #eee; }
+        input[type="text"] { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #ddd; outline: none; box-sizing: border-box; }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="/" class="nav-back"><i class="fas fa-arrow-left"></i> Volver a la Tienda</a>
-        <div class="header">
-            <div style="width: 80px; height: 80px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2rem; font-weight: 800;">{{ usuario.nombre[0] }}</div>
-            <h1 style="margin:0">{{ usuario.nombre }}</h1>
-            <p style="color: #64748b;">Vendedor de Sabanalarga</p>
-            <a href="/chat/{{ usuario.id }}" style="background: #2563eb; color: white; padding: 12px 30px; border-radius: 15px; text-decoration: none; font-weight: 700; display: inline-block; margin-top: 10px;"><i class="fas fa-comment"></i> Chatear con Vendedor</a>
+        <a href="/" style="text-decoration: none; color: #2563eb; font-weight: 700;"><i class="fas fa-chevron-left"></i> Volver a la Tienda</a>
+        
+        <div class="profile-card">
+            <div class="avatar">{{ usuario.nombre[0] }}</div>
+            <h1 style="margin:0; font-size: 2rem;">{{ usuario.nombre }}</h1>
+            <p style="color: #64748b;">Vendedor Oficial de Sabanalarga</p>
+            <a href="/chat/{{ usuario.id }}" class="btn-msg"><i class="fab fa-whatsapp"></i> Chatear Ahora</a>
         </div>
 
         {% for p in productos %}
         <div class="post">
-            <div class="media-container">
-                {% if p.video %}
-                    <video controls><source src="{{ url_for('static', filename='uploads/' + p.video) }}" type="video/mp4"></video>
-                {% else %}
-                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-                {% endif %}
-            </div>
-            <div class="p-info">
+            {% if p.video %}
+                <video class="media" controls><source src="{{ url_for('static', filename='uploads/' + p.video) }}" type="video/mp4"></video>
+            {% else %}
+                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="media">
+            {% endif %}
+
+            <div class="post-body">
                 <h2 style="margin:0">{{ p.nombre }}</h2>
-                <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
-                <p>{{ p.descripcion }}</p>
+                <div style="font-size: 2rem; font-weight: 800; color: #2563eb; margin: 10px 0;">${{ "{:,.0f}".format(p.precio) }}</div>
+                <p style="line-height: 1.6; color: #475569;">{{ p.descripcion }}</p>
             </div>
-            <div class="comment-section">
-                <p style="font-weight: 800; font-size: 0.9rem; color: #64748b; margin-bottom: 15px;">COMENTARIOS</p>
+
+            <div class="comments">
+                <p style="font-weight: 800; margin-bottom: 15px;">COMENTARIOS</p>
                 {% for c in p.comentarios %}
-                    <div style="margin-bottom: 10px; font-size: 0.95rem;"><strong>{{ c.autor.nombre }}:</strong> {{ c.contenido }}</div>
+                    <div style="margin-bottom: 10px;"><strong>{{ c.autor.nombre }}:</strong> {{ c.contenido }}</div>
                 {% endfor %}
-                <form action="/comentar/{{ p.id }}" method="POST" style="display:flex; gap:10px; margin-top:15px;">
-                    <input type="text" name="comentario" placeholder="Escribe un comentario..." style="flex:1; padding:10px; border-radius:12px; border:1px solid #ddd;" required>
-                    <button type="submit" style="background:#2563eb; color:white; border:none; border-radius:12px; padding:0 15px;"><i class="fas fa-paper-plane"></i></button>
+                <form action="/comentar/{{ p.id }}" method="POST" style="margin-top: 20px; position: relative;">
+                    <input type="text" name="comentario" placeholder="Escribe un comentario..." required>
+                    <button type="submit" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #2563eb; font-size: 1.5rem;"><i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
         </div>
