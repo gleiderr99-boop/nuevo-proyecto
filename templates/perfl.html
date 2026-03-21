@@ -9,40 +9,28 @@
     <style>
         :root { --primary: #2563eb; --bg: #f0f2f5; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
-        
         .container { max-width: 650px; margin: 0 auto; }
-        
-        /* Encabezado del Vendedor */
         .profile-header { background: white; padding: 40px; border-radius: 30px; text-align: center; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #fff; }
         .avatar { width: 90px; height: 90px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem; font-weight: 800; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
-        
         .btn-chat { background: #25d366; color: white; padding: 15px 30px; border-radius: 20px; text-decoration: none; font-weight: 800; display: inline-flex; align-items: center; gap: 10px; margin-top: 15px; transition: 0.3s; }
         .btn-chat:hover { transform: scale(1.05); background: #128c7e; }
-
-        /* Publicaciones (Productos) */
         .post { background: white; border-radius: 30px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #eee; }
         .media-box { width: 100%; background: #000; display: flex; align-items: center; justify-content: center; min-height: 350px; }
         .media-box video, .media-box img { max-width: 100%; max-height: 600px; display: block; }
-        
         .post-info { padding: 30px; }
         .post-info h2 { margin: 0; font-size: 1.8rem; letter-spacing: -1px; }
         .post-price { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin: 15px 0; }
         .description { line-height: 1.6; color: #475569; font-size: 1.1rem; }
-
-        /* Comentarios */
         .comments-section { background: #f8fafc; padding: 25px; border-top: 1px solid #f1f5f9; }
         .comment { margin-bottom: 12px; font-size: 0.95rem; background: white; padding: 12px; border-radius: 15px; border: 1px solid #eee; }
-        
         .comment-form { display: flex; gap: 10px; margin-top: 20px; }
         .comment-form input { flex: 1; padding: 12px 20px; border-radius: 15px; border: 1px solid #ddd; outline: none; }
         .comment-form button { background: var(--primary); color: white; border: none; padding: 0 20px; border-radius: 15px; cursor: pointer; }
-
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .nav-top a { text-decoration: none; color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="nav-top">
             <a href="/"><i class="fas fa-arrow-left"></i> Volver a la Tienda</a>
@@ -55,7 +43,6 @@
             <div class="avatar">{{ usuario.nombre[0] | upper }}</div>
             <h1 style="margin:0">{{ usuario.nombre }}</h1>
             <p style="color: #64748b; font-weight: 600;">Vendedor en Sabanalarga</p>
-            
             {% if usuario.telefono and usuario.telefono != 'Cliente' %}
                 <a href="https://wa.me/{{ usuario.telefono }}" target="_blank" class="btn-chat">
                     <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
@@ -75,20 +62,17 @@
                     <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}">
                 {% endif %}
             </div>
-
             <div class="post-info">
                 <h2>{{ p.nombre }}</h2>
                 <div class="post-price">${{ "{:,.0f}".format(p.precio) }}</div>
                 <p class="description">{{ p.descripcion }}</p>
                 <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 20px;"><i class="fas fa-tag"></i> Categoría: {{ p.categoria }}</p>
             </div>
-
             <div class="comments-section">
                 <p style="font-weight: 800; font-size: 0.85rem; color: #64748b; margin-bottom: 15px; text-transform: uppercase;">Comentarios</p>
-                
                 {% for c in p.comentarios %}
                 <div class="comment">
-                    <strong>{{ c.autor.nombre }}:</strong> {{ c.contenido }}
+                    <strong>{{ c.autor.nombre if c.autor else 'Usuario' }}:</strong> {{ c.contenido }}
                 </div>
                 {% else %}
                     <p style="font-size: 0.9rem; color: #94a3b8;">Aún no hay comentarios.</p>
@@ -108,6 +92,5 @@
         </div>
         {% endfor %}
     </div>
-
 </body>
 </html>
