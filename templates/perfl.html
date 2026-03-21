@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Perfil de {{ usuario.nombre }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .header { background: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .post { background: white; border-radius: 15px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        video, img { width: 100%; display: block; max-height: 450px; object-fit: cover; }
-        .info { padding: 20px; }
-        .comments { background: #f8fafc; padding: 15px; border-top: 1px solid #eee; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 650px; margin: 0 auto; }
+        .header { background: white; padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .nav-back { margin-bottom: 15px; display: block; text-decoration: none; color: #2563eb; font-weight: 700; }
+        .post { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        .media-container { width: 100%; background: #000; display: flex; align-items: center; justify-content: center; min-height: 300px; }
+        video, img { max-width: 100%; max-height: 500px; display: block; }
+        .p-info { padding: 25px; }
+        .price { font-size: 1.8rem; font-weight: 800; color: #2563eb; margin: 10px 0; }
+        .comment-section { padding: 20px; background: #f8fafc; border-top: 1px solid #edf2f7; }
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="/" class="nav-back"><i class="fas fa-arrow-left"></i> Volver a la Tienda</a>
         <div class="header">
+            <div style="width: 80px; height: 80px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2rem; font-weight: 800;">{{ usuario.nombre[0] }}</div>
             <h1 style="margin:0">{{ usuario.nombre }}</h1>
-            <p>Vendedor en Sabanalarga Market</p>
-            <a href="/chat/{{ usuario.id }}" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 700;">Enviar Mensaje</a>
+            <p style="color: #64748b;">Vendedor de Sabanalarga</p>
+            <a href="/chat/{{ usuario.id }}" style="background: #2563eb; color: white; padding: 12px 30px; border-radius: 15px; text-decoration: none; font-weight: 700; display: inline-block; margin-top: 10px;"><i class="fas fa-comment"></i> Chatear con Vendedor</a>
         </div>
 
         {% for p in productos %}
         <div class="post">
-            {% if p.video %}
-                <video controls muted>
-                    <source src="{{ url_for('static', filename='uploads/' + p.video) }}" type="video/mp4">
-                    Tu navegador no soporta videos.
-                </video>
-            {% else %}
-                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-            {% endif %}
-            
-            <div class="info">
-                <h2>{{ p.nombre }} - <span style="color:#2563eb">${{ "{:,.0f}".format(p.precio) }}</span></h2>
+            <div class="media-container">
+                {% if p.video %}
+                    <video controls><source src="{{ url_for('static', filename='uploads/' + p.video) }}" type="video/mp4"></video>
+                {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+                {% endif %}
+            </div>
+            <div class="p-info">
+                <h2 style="margin:0">{{ p.nombre }}</h2>
+                <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
                 <p>{{ p.descripcion }}</p>
             </div>
-
-            <div class="comments">
-                <strong>Comentarios:</strong>
+            <div class="comment-section">
+                <p style="font-weight: 800; font-size: 0.9rem; color: #64748b; margin-bottom: 15px;">COMENTARIOS</p>
                 {% for c in p.comentarios %}
-                    <p style="font-size: 0.9rem; margin: 5px 0;"><strong>{{ c.autor.nombre }}:</strong> {{ c.contenido }}</p>
+                    <div style="margin-bottom: 10px; font-size: 0.95rem;"><strong>{{ c.autor.nombre }}:</strong> {{ c.contenido }}</div>
                 {% endfor %}
-                <form action="/comentar/{{ p.id }}" method="POST" style="margin-top:10px; display:flex; gap:5px;">
-                    <input type="text" name="comentario" placeholder="Escribe un comentario..." style="flex:1; padding:8px; border-radius:10px; border:1px solid #ddd;" required>
-                    <button type="submit" style="background:#2563eb; color:white; border:none; border-radius:10px; padding:0 10px;"><i class="fas fa-paper-plane"></i></button>
+                <form action="/comentar/{{ p.id }}" method="POST" style="display:flex; gap:10px; margin-top:15px;">
+                    <input type="text" name="comentario" placeholder="Escribe un comentario..." style="flex:1; padding:10px; border-radius:12px; border:1px solid #ddd;" required>
+                    <button type="submit" style="background:#2563eb; color:white; border:none; border-radius:12px; padding:0 15px;"><i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
         </div>
