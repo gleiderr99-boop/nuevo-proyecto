@@ -2,15 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Panel | Sabanalarga MKT</title>
+    <title>Mi Panel | Sabanalarga</title>
     <style>
         body { font-family: sans-serif; background: #f4f7f6; display: flex; margin: 0; min-height: 100vh; }
         .sidebar { width: 300px; background: white; padding: 20px; border-right: 1px solid #ddd; }
         .main { flex: 1; padding: 40px; }
-        .form-group { margin-bottom: 15px; }
-        input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .card-msg { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #2563eb; text-decoration: none; display: block; color: #333; }
-        .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 700; }
+        .card-msg { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #2563eb; text-decoration: none; display: block; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .form-card { background: white; padding: 20px; border-radius: 15px; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -19,37 +19,35 @@
         {% for m in mensajes %}
             <a href="/chat/{{ m.emisor_id if m.emisor_id != session['user_id'] else m.receptor_id }}" class="card-msg">
                 <strong>{{ m.emisor.nombre if m.emisor_id != session['user_id'] else m.receptor.nombre }}</strong>
-                <p style="margin: 5px 0; font-size: 0.8rem; overflow: hidden; white-space: nowrap;">{{ m.contenido }}</p>
+                <p style="margin:0; font-size:0.8rem; color:#666;">Haz clic para chatear</p>
             </a>
         {% endfor %}
         <hr>
-        <a href="/logout" style="color: red;">Cerrar Sesión</a>
+        <a href="/" style="display:block; margin-bottom:10px; text-decoration:none; color:blue;">Ir al Inicio</a>
+        <a href="/logout" style="color:red; text-decoration:none;">Cerrar Sesión</a>
     </div>
 
     <div class="main">
         <h1>¡Hola, {{ user.nombre }}!</h1>
-        
         {% if user.telefono != "Cliente" %}
-        <div style="background: white; padding: 25px; border-radius: 15px; max-width: 500px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <h3>Subir nuevo producto / anuncio</h3>
+        <div class="form-card">
+            <h3>Publicar nuevo producto</h3>
             <form method="POST" enctype="multipart/form-data">
-                <div class="form-group"><label>Nombre</label><input type="text" name="nombre" required></div>
-                <div class="form-group"><label>Precio</label><input type="number" name="precio" required></div>
-                <div class="form-group"><label>Categoría</label>
-                    <select name="categoria">
-                        <option>Comida</option><option>Moda</option><option>Servicios</option><option>Otros</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Descripción</label><textarea name="descripcion" rows="3"></textarea></div>
-                <div class="form-group"><label>Foto (Obligatoria)</label><input type="file" name="foto" accept="image/*" required></div>
-                <div class="form-group"><label>Video Promocional (Opcional)</label><input type="file" name="video" accept="video/*"></div>
-                <button type="submit" class="btn">Publicar ahora</button>
+                <input type="text" name="nombre" placeholder="Nombre del producto" required>
+                <input type="number" name="precio" placeholder="Precio ($)" required>
+                <select name="categoria">
+                    <option>Comida</option><option>Moda</option><option>Servicios</option><option>Otros</option>
+                </select>
+                <textarea name="descripcion" placeholder="Descripción corta..."></textarea>
+                <label>Foto (Requerida):</label>
+                <input type="file" name="foto" accept="image/*" required>
+                <label>Video Promocional (Opcional):</label>
+                <input type="file" name="video" accept="video/*">
+                <button type="submit" class="btn">Subir Producto</button>
             </form>
         </div>
         {% else %}
-        <div style="background: #e0e7ff; padding: 20px; border-radius: 10px;">
-            <p><strong>Nota:</strong> Como eres cuenta de Cliente, puedes ver tus chats pero no subir productos. ¡Para vender, regístrate como vendedor!</p>
-        </div>
+            <p>Estás en modo cliente. Aquí verás tus mensajes con vendedores.</p>
         {% endif %}
     </div>
 </body>
