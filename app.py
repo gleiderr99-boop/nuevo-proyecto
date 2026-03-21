@@ -137,8 +137,11 @@ def gleider_admin():
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
+    # Buscamos al usuario o soltamos error 404 si no existe
     usuario = User.query.get_or_404(user_id)
+    # Filtramos TODOS los productos que pertenecen a este ID de usuario
     productos_vendedor = Producto.query.filter_by(user_id=user_id).all()
+    
     return render_template('perfil.html', usuario=usuario, productos=productos_vendedor)
 
 @app.route('/chat/<int:user_b>')
