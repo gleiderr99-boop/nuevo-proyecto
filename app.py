@@ -17,7 +17,6 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 db = SQLAlchemy(app)
 
 # --- MODELOS ---
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
@@ -32,11 +31,10 @@ class Producto(db.Model):
     nombre = db.Column(db.String(100))
     precio = db.Column(db.Float)
     imagen = db.Column(db.String(200))
-    video = db.Column(db.String(200))  # <-- AGREGADO PARA VIDEOS
+    video = db.Column(db.String(200)) 
     descripcion = db.Column(db.Text)
     categoria = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    # Relación para ver comentarios directamente desde el producto
     comentarios = db.relationship('Comentario', backref='producto', lazy=True, cascade="all, delete-orphan")
 
 class Mensaje(db.Model):
@@ -62,7 +60,6 @@ with app.app_context():
     db.create_all()
 
 # --- RUTAS ---
-
 @app.route('/')
 def inicio():
     query = request.args.get('q')
@@ -77,7 +74,7 @@ def registro():
         es_gleider = (correo == 'gleiderr99@gmail.com')
         tel_final = request.form.get('telefono') if tipo == 'vendedor' else "Cliente"
         if User.query.filter_by(correo=correo).first():
-            return "El correo ya existe. <a href='/login'>Inicia sesión</a>"
+            return "Correo ya existe."
         nuevo_u = User(nombre=request.form['nombre'], correo=correo, telefono=tel_final,
                      password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'), es_admin=es_gleider)
         db.session.add(nuevo_u); db.session.commit()
@@ -91,7 +88,6 @@ def login():
         if user and check_password_hash(user.password, request.form['pass']):
             session['user_id'], session['user_name'], session['es_admin'] = user.id, user.nombre, user.es_admin
             return redirect(url_for('gleider_admin'))
-        return "Datos incorrectos."
     return render_template('login.html')
 
 @app.route('/gleider_admin', methods=['GET', 'POST'])
@@ -101,33 +97,22 @@ def gleider_admin():
     
     if request.method == 'POST' and user.telefono != "Cliente":
         foto = request.files.get('foto')
-        video = request.files.get('video') # <-- CAPTURAR VIDEO
-        
-        fname_foto = ""
-        fname_video = ""
+        video = request.files.get('video')
+        f_foto, f_video = "", ""
+        if foto:
+            f_foto = secure_filename(foto.filename)
+            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], f_foto))
+        if video:
+            f_video = secure_filename(video.filename)
+            video.save(os.path.join(app.config['UPLOAD_FOLDER'], f_video))
 
-        if foto and foto.filename != '':
-            fname_foto = secure_filename(foto.filename)
-            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], fname_foto))
-        
-        if video and video.filename != '':
-            fname_video = secure_filename(video.filename)
-            video.save(os.path.join(app.config['UPLOAD_FOLDER'], fname_video))
-
-        nuevo = Producto(
-            nombre=request.form.get('nombre'), 
-            precio=float(request.form.get('precio', 0)),
-            descripcion=request.form.get('descripcion'), 
-            categoria=request.form.get('categoria'),
-            imagen=fname_foto, 
-            video=fname_video, # <-- GUARDAR VIDEO
-            user_id=user.id
-        )
+        nuevo = Producto(nombre=request.form.get('nombre'), precio=float(request.form.get('precio', 0)),
+                        descripcion=request.form.get('descripcion'), categoria=request.form.get('categoria'),
+                        imagen=f_foto, video=f_video, user_id=user.id)
         db.session.add(nuevo); db.session.commit()
         return redirect(url_for('gleider_admin'))
 
-    # Lógica de chats (unificada)
-    mensajes = Mensaje.query.filter((Mensaje.emisor_id == user.id) | (Mensaje.receptor_id == user.id)).order_by(Mensaje.fecha.desc()).all()
+    mensajes = Mensaje.query.filter((Mensaje.emisor_id==user.id)|(Mensaje.receptor_id==user.id)).order_by(Mensaje.fecha.desc()).all()
     chats_vistos, mensajes_unicos = [], []
     for m in mensajes:
         otro_id = m.emisor_id if m.emisor_id != user.id else m.receptor_id
@@ -135,30 +120,25 @@ def gleider_admin():
             mensajes_unicos.append(m); chats_vistos.append(otro_id)
 
     productos = Producto.query.filter_by(user_id=user.id).all()
-    usuarios = User.query.all() if user.es_admin else []
-    return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos, usuarios=usuarios)
+    return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos)
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
     usuario = User.query.get_or_404(user_id)
-    productos_vendedor = Producto.query.filter_by(user_id=user_id).all()
-    return render_template('perfil.html', usuario=usuario, productos=productos_vendedor)
+    productos = Producto.query.filter_by(user_id=user_id).all()
+    return render_template('perfil.html', usuario=usuario, productos=productos)
 
 @app.route('/comentar/<int:p_id>', methods=['POST'])
 def comentar(p_id):
     if 'user_id' not in session: return redirect(url_for('login'))
-    texto = request.form.get('comentario')
-    if texto:
-        nuevo = Comentario(contenido=texto, user_id=session['user_id'], producto_id=p_id)
-        db.session.add(nuevo); db.session.commit()
+    nuevo = Comentario(contenido=request.form.get('comentario'), user_id=session['user_id'], producto_id=p_id)
+    db.session.add(nuevo); db.session.commit()
     return redirect(request.referrer)
 
 @app.route('/chat/<int:user_b>')
 def chat(user_b):
     if 'user_id' not in session: return redirect(url_for('login'))
     yo = session['user_id']
-    Mensaje.query.filter_by(receptor_id=yo, emisor_id=user_b, leido=False).update({Mensaje.leido: True})
-    db.session.commit()
     mensajes = Mensaje.query.filter(((Mensaje.emisor_id==yo)&(Mensaje.receptor_id==user_b))|((Mensaje.emisor_id==user_b)&(Mensaje.receptor_id==yo))).all()
     return render_template('chat.html', mensajes=mensajes, otro=User.query.get(user_b))
 
@@ -168,17 +148,13 @@ def enviar_mensaje(p_id):
     prod = Producto.query.get(p_id)
     emisor_id = session['user_id']
     receptor_id = request.form.get('receptor_id') if emisor_id == prod.user_id else prod.user_id
-    if receptor_id:
-        nuevo_m = Mensaje(contenido=request.form.get('mensaje'), emisor_id=emisor_id, receptor_id=int(receptor_id), producto_id=p_id)
-        db.session.add(nuevo_m); db.session.commit()
-        return redirect(url_for('chat', user_b=receptor_id))
-    return redirect(url_for('inicio'))
+    nuevo_m = Mensaje(contenido=request.form.get('mensaje'), emisor_id=emisor_id, receptor_id=int(receptor_id), producto_id=p_id)
+    db.session.add(nuevo_m); db.session.commit()
+    return redirect(url_for('chat', user_b=receptor_id))
 
 @app.route('/eliminar/<int:id>')
 def eliminar_producto(id):
-    p = Producto.query.get(id)
-    if p and (session.get('es_admin') or p.user_id == session.get('user_id')):
-        db.session.delete(p); db.session.commit()
+    p = Producto.query.get(id); db.session.delete(p); db.session.commit()
     return redirect(url_for('gleider_admin'))
 
 @app.route('/logout')
