@@ -3,236 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabanalarga Market | La mejor vitrina</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Sabanalarga Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --accent: #f59e0b;
-            --bg: #f8fafc;
-            --text-main: #1e293b;
-            --white: #ffffff;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            color: var(--text-main);
-        }
-
-        /* Navbar Pro con Botones */
-        nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
-
-        .logo {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-decoration: none;
-            letter-spacing: -1px;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .btn-nav {
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 10px 20px;
-            border-radius: 12px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-login {
-            color: var(--text-main);
-        }
-
-        .btn-sell {
-            background: var(--accent);
-            color: white !important;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        }
-
-        .btn-messages {
-            background: var(--primary);
-            color: white !important;
-        }
-
-        .btn-nav:hover {
-            transform: translateY(-2px);
-            opacity: 0.9;
-        }
-
-        /* Hero & Search */
-        .hero {
-            padding: 60px 8% 40px;
-            text-align: center;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-        }
-
-        .search-container {
-            max-width: 600px;
-            margin: 30px auto;
-            position: relative;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 18px 25px;
-            border-radius: 20px;
-            border: 2px solid #e2e8f0;
-            font-size: 1rem;
-            outline: none;
-            box-shadow: var(--shadow);
-            transition: 0.3s;
-        }
-
-        .search-container input:focus { border-color: var(--primary); }
-
-        /* Grid de Productos */
-        .products-grid {
-            padding: 20px 8% 80px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-        }
-
-        .product-card {
-            background: var(--white);
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: 0.4s;
-            border: 1px solid #f1f5f9;
-        }
-
-        .product-card:hover { transform: translateY(-10px); }
-
-        .img-container {
-            height: 220px;
-            position: relative;
-        }
-
-        .img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .badge-cat {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(255,255,255,0.9);
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .p-info { padding: 20px; }
-        .p-price { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        
-        .btn-contact {
-            background: #f1f5f9;
-            color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 700;
-            transition: 0.3s;
-        }
-
-        .btn-contact:hover { background: var(--primary); color: white; }
-
+        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; }
+        nav { background: white; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.4rem; }
+        .nav-btns { display: flex; gap: 10px; }
+        .btn { padding: 8px 15px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: 0.3s; }
+        .btn-sell { background: var(--accent); color: white; }
+        .btn-msg { background: var(--primary); color: white; }
+        .btn-login { color: #333; border: 1px solid #ddd; }
+        .hero { text-align: center; padding: 40px 20px; }
+        .search-box { max-width: 500px; margin: 20px auto; display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 20px 8%; }
+        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .content { padding: 15px; }
+        .btn-chat { background: var(--primary); color: white; text-decoration: none; display: block; text-align: center; padding: 10px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
     </style>
 </head>
 <body>
-
     <nav>
-        <a href="/" class="logo">SABANALARGA<span style="color:var(--accent)">.</span>MKT</a>
-        
-        <div class="nav-buttons">
+        <a href="/" class="logo">SABANALARGA MKT</a>
+        <div class="nav-btns">
             {% if session.get('user_id') %}
-                <a href="/gleider_admin" class="btn-nav btn-messages">
-                    <i class="fas fa-comment-dots"></i> Mis Mensajes
-                </a>
-                <a href="/logout" class="btn-login" title="Cerrar Sesión">
-                    <i class="fas fa-power-off" style="color:#ef4444"></i>
-                </a>
+                <a href="/gleider_admin" class="btn btn-msg"><i class="fas fa-comments"></i> Mis Mensajes</a>
+                <a href="/logout" class="btn btn-login">Salir</a>
             {% else %}
-                <a href="/login" class="btn-nav btn-login">Entrar</a>
-                <a href="/registro" class="btn-nav btn-sell">
-                    <i class="fas fa-plus-circle"></i> Vender Ahora
-                </a>
+                <a href="/login" class="btn btn-login">Entrar</a>
+                <a href="/registro" class="btn btn-sell">Vender Ahora</a>
             {% endif %}
         </div>
     </nav>
-
-    <header class="hero">
-        <h1 style="font-size: 2.5rem; margin: 0; letter-spacing: -1px;">¡El Mercado en tu mano!</h1>
-        <p style="color: #64748b; margin-top: 10px;">Encuentra productos y servicios en Sabanalarga, Atlántico.</p>
-        
-        <form action="/" method="GET" class="search-container">
-            <input type="text" name="q" placeholder="Buscar zapatos, comida, servicios..." autocomplete="off">
-            <button type="submit" style="position:absolute; right:15px; top:12px; background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:12px; cursor:pointer;">
-                <i class="fas fa-search"></i>
-            </button>
+    <div class="hero">
+        <h1>Lo mejor de Sabanalarga en un solo lugar</h1>
+        <form action="/" class="search-box">
+            <input type="text" name="q" placeholder="¿Qué buscas hoy?">
+            <button type="submit" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Buscar</button>
         </form>
-    </header>
-
-    <main class="products-grid">
+    </div>
+    <div class="grid">
         {% for p in productos %}
-        <div class="product-card">
-            <div class="img-container">
-                <span class="badge-cat">{{ p.categoria }}</span>
-                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-            </div>
-            <div class="p-info">
-                <h3 style="margin:0; font-size: 1.1rem;">{{ p.nombre }}</h3>
-                <div class="p-price">${{ "{:,.0f}".format(p.precio) }}</div>
-                
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
-                    <i class="fas fa-store" style="font-size: 0.8rem; color: #94a3b8;"></i>
-                    <a href="/perfil/{{ p.user_id }}" style="font-size: 0.85rem; color: #64748b; text-decoration: none; font-weight: 600;">
-                        {{ p.vendedor.nombre }}
-                    </a>
-                </div>
-
-                <a href="/chat/{{ p.user_id }}" class="btn-contact">
-                    <i class="fab fa-whatsapp"></i> Preguntar
-                </a>
+        <div class="card">
+            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+            <div class="content">
+                <h3 style="margin: 0;">{{ p.nombre }}</h3>
+                <p style="color: var(--primary); font-weight: 800; font-size: 1.2rem;">${{ "{:,.0f}".format(p.precio) }}</p>
+                <a href="/chat/{{ p.user_id }}" class="btn-chat">Preguntar</a>
+                <a href="/perfil/{{ p.user_id }}" style="display: block; text-align: center; margin-top: 8px; color: #666; font-size: 0.8rem; text-decoration: none;">Ver Perfil del Vendedor</a>
             </div>
         </div>
         {% endfor %}
-    </main>
-
+    </div>
 </body>
 </html>
