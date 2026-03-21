@@ -87,10 +87,13 @@ def login():
             return redirect(url_for('gleider_admin'))
     return render_template('login.html')
 
+# ... (Todo el inicio igual hasta la ruta de admin)
+
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
     if 'user_id' not in session: return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
+    
     if request.method == 'POST' and user.telefono != "Cliente":
         f, v = request.files.get('foto'), request.files.get('video')
         fn_f, fn_v = "", ""
@@ -109,12 +112,12 @@ def gleider_admin():
     for m in mensajes:
         otro_id = m.emisor_id if m.emisor_id != user.id else m.receptor_id
         if otro_id not in chats_vistos: mensajes_unicos.append(m); chats_vistos.append(otro_id)
-    # Al final de la función gleider_admin en app.py:
-    productos = Producto.query.filter_by(user_id=user.id).all()
-    # ESTO ES LO QUE TRAE A TODAS LAS PERSONAS SI ERES ADMIN
-    usuarios = User.query.all() if user.es_admin else [] 
     
+    productos = Producto.query.filter_by(user_id=user.id).all()
+    usuarios = User.query.all() if user.es_admin else [] # Para ver los registrados
     return render_template('admin.html', user=user, productos=productos, mensajes=mensajes_unicos, usuarios=usuarios)
+
+# ... (El resto de rutas se mantienen)
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
