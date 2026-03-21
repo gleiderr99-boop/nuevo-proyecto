@@ -23,7 +23,6 @@ class User(db.Model):
     telefono = db.Column(db.String(20))
     password = db.Column(db.String(200), nullable=False)
     es_admin = db.Column(db.Boolean, default=False)
-    # Cambiamos el backref a 'vendedor_rel' para evitar choques
     productos = db.relationship('Producto', backref='vendedor', lazy=True)
 
 class Producto(db.Model):
@@ -35,7 +34,8 @@ class Producto(db.Model):
     descripcion = db.Column(db.Text)
     categoria = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    comentarios = db.relationship('Comentario', backref='producto', lazy=True, cascade="all, delete-orphan")
+    # Corregido backref para evitar conflictos
+    comentarios = db.relationship('Comentario', backref='producto_rel', lazy=True, cascade="all, delete-orphan")
 
 class Mensaje(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -54,7 +54,8 @@ class Comentario(db.Model):
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     producto_id = db.Column(db.Integer, db.ForeignKey('producto.id'))
-    autor = db.relationship('User', backref='sus_comentarios')
+    # Corregido backref para el autor
+    autor = db.relationship('User', backref='comentarios_realizados')
 
 with app.app_context():
     db.create_all()
