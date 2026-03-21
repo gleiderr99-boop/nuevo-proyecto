@@ -121,9 +121,14 @@ def gleider_admin():
 
 @app.route('/perfil/<int:user_id>')
 def perfil(user_id):
-    u = User.query.get_or_404(user_id)
-    p = Producto.query.filter_by(user_id=user_id).all()
-    return render_template('perfil.html', usuario=u, productos=p)
+    try:
+        # Buscamos al usuario que es dueño de los productos
+        usuario = User.query.get_or_404(user_id)
+        # Traemos sus productos
+        productos_vendedor = Producto.query.filter_by(user_id=user_id).all()
+        return render_template('perfil.html', usuario=usuario, productos=productos_vendedor)
+    except Exception as e:
+        return f"Error interno: {str(e)}", 500
 
 @app.route('/comentar/<int:p_id>', methods=['POST'])
 def comentar(p_id):
