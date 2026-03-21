@@ -6,8 +6,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = 'sabanalarga_market_ultra_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tienda.db'
+app.secret_key = os.environ.get('SECRET_KEY', 'sabanalarga_market_ultra_key')
+
+# Configuración de base de datos para Render
+# Usamos un path absoluto para evitar errores de escritura en Render
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tienda.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
@@ -16,7 +20,7 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 db = SQLAlchemy(app)
 
-# --- MODELOS ---
+# --- MODELOS --- (Se mantienen igual)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
@@ -59,7 +63,7 @@ class Comentario(db.Model):
 with app.app_context():
     db.create_all()
 
-# --- RUTAS ---
+# --- RUTAS --- (Se mantienen igual)
 @app.route('/')
 def inicio():
     query = request.args.get('q')
@@ -99,10 +103,10 @@ def gleider_admin():
         foto = request.files.get('foto')
         video = request.files.get('video')
         f_foto, f_video = "", ""
-        if foto:
+        if foto and foto.filename != '':
             f_foto = secure_filename(foto.filename)
             foto.save(os.path.join(app.config['UPLOAD_FOLDER'], f_foto))
-        if video:
+        if video and video.filename != '':
             f_video = secure_filename(video.filename)
             video.save(os.path.join(app.config['UPLOAD_FOLDER'], f_video))
 
@@ -161,6 +165,8 @@ def eliminar_producto(id):
 def logout():
     session.clear(); return redirect(url_for('inicio'))
 
+# IMPORTANTE PARA RENDER:
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    # Render usa la variable de entorno PORT
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
