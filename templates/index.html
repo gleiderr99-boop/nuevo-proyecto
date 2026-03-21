@@ -3,180 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabanalarga Market | Apoya lo Local</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Perfil Vendedor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; --white: #ffffff; --perfil: #6366f1; }
-        
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; overflow-x: hidden; }
-        
-        /* Navbar */
-        nav { 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(15px); 
-            padding: 15px 8%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 4px 30px rgba(0,0,0,0.03); 
-            position: sticky; top: 0; z-index: 1000; 
-        }
-        
-        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.7rem; letter-spacing: -1.5px; }
-        .logo span { color: var(--accent); }
-
-        .nav-btns { display: flex; gap: 12px; align-items: center; }
-        
-        .btn { padding: 10px 22px; border-radius: 14px; text-decoration: none; font-weight: 700; transition: 0.4s; font-size: 0.9rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        
-        .btn-register { background: #e0e7ff; color: var(--primary); }
-        .btn-sell { background: var(--accent); color: white; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
-        .btn-login { color: #475569; text-decoration: none; font-weight: 700; }
-        .btn-panel { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); }
-
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
-
-        /* Hero */
-        .hero { text-align: center; padding: 80px 20px; background: radial-gradient(circle at top, #ffffff, #f8fafc); }
-        .hero h1 { font-size: 3.5rem; margin: 0; letter-spacing: -2px; line-height: 1.1; }
-        .hero p { color: #64748b; font-size: 1.2rem; margin: 15px 0 30px; font-weight: 500; }
-
-        .search-box { 
-            max-width: 650px; margin: 0 auto; display: flex; background: white; 
-            padding: 8px; border-radius: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-            border: 1px solid #edf2f7;
-        }
-        .search-box input { flex: 1; border: none; padding: 15px 25px; border-radius: 20px; outline: none; font-size: 1.1rem; }
-        .search-box button { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 20px; font-weight: 700; cursor: pointer; }
-
-        /* Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 35px; padding: 50px 8%; }
-        
-        .card { 
-            background: white; border-radius: 30px; overflow: hidden; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.02); transition: 0.5s; 
-            border: 1px solid rgba(0,0,0,0.03); 
-        }
-        .card:hover { transform: translateY(-15px); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
-        
-        .img-container { width: 100%; height: 250px; overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center;}
-        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s ease; }
-        .card:hover img { transform: scale(1.15); }
-
-        /* Estilo para cuando no hay foto pero hay video */
-        .no-photo-msg { color: white; text-align: center; font-weight: 700; }
-        .no-photo-msg i { font-size: 3rem; margin-bottom: 10px; display: block; color: var(--accent); }
-
-        .badge { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 6px 15px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; color: var(--primary); z-index: 2; }
-
-        .content { padding: 25px; }
-        .price { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        
-        /* Botones de acción */
-        .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-
-        .btn-view { 
-            background: #f1f5f9; color: var(--primary); text-decoration: none; 
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px; border-radius: 15px; font-weight: 800; transition: 0.3s;
-        }
-        .btn-view:hover { background: var(--primary); color: white; }
-
-        .btn-perfil-vendedor {
-            background: #eff6ff; color: var(--perfil); text-decoration: none;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px; border-radius: 15px; font-weight: 800; transition: 0.3s;
-            border: 1px solid #dbeafe;
-        }
-        .btn-perfil-vendedor:hover { background: var(--perfil); color: white; }
-
-        .empty { grid-column: 1/-1; text-align: center; padding: 100px 20px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .post { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .media { width: 100%; background: #000; }
+        video, img { width: 100%; display: block; max-height: 500px; object-fit: contain; }
+        .info { padding: 20px; }
+        .comment-section { background: #f8fafc; padding: 20px; border-top: 1px solid #eee; }
+        .comment { background: white; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #eee; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="/" class="logo">SABANALARGA<span>.</span>MKT</a>
-        <div class="nav-btns">
-            {% if session.get('user_id') %}
-                <a href="{{ url_for('gleider_admin') }}" class="btn btn-panel">
-                    <i class="fas fa-th-large"></i> Mi Panel
-                </a>
-                <a href="{{ url_for('logout') }}" class="btn btn-login">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
-            {% else %}
-                <a href="{{ url_for('login') }}" class="btn btn-login">Entrar</a>
-                <a href="{{ url_for('registro') }}" class="btn btn-register">
-                    <i class="fas fa-user-plus"></i> Crear Cuenta
-                </a>
-                <a href="{{ url_for('registro') }}" class="btn btn-sell">
-                    <i class="fas fa-shopping-basket"></i> Vender
-                </a>
-            {% endif %}
-        </div>
-    </nav>
+    <div class="container">
+        <a href="/" style="text-decoration:none; color:#2563eb; font-weight:700;">← Volver</a>
+        <h1 style="text-align:center;">{{ usuario.nombre }}</h1>
 
-    <div class="hero">
-        <h1>Apoya lo local, <br><span style="color:var(--primary)">crece Sabanalarga.</span></h1>
-        <p><i class="fas fa-heart" style="color:#ef4444"></i> Impulsando el emprendimiento de nuestro municipio</p>
-        <form action="/" class="search-box">
-            <input type="text" name="q" placeholder="¿Qué estás buscando hoy?">
-            <button type="submit"><i class="fas fa-search"></i> Buscar</button>
-        </form>
-    </div>
-
-    <div class="grid">
         {% for p in productos %}
-        <div class="card">
-            <div class="img-container">
-                <div class="badge">
-                    {% if p.categoria == 'Comida' %}<i class="fas fa-hamburger"></i>
-                    {% elif p.categoria == 'Moda' %}<i class="fas fa-bag-shopping"></i>
-                    {% else %}<i class="fas fa-star"></i>{% endif %}
-                    {{ p.categoria | upper }}
-                </div>
-                
-                {% if p.imagen %}
+        <div class="post">
+            <div class="media">
+                {% if p.video %}
+                    <video controls>
+                        <source src="{{ url_for('static', filename='uploads/' + p.video) }}" type="video/mp4">
+                    </video>
+                {% elif p.imagen %}
                     <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-                {% elif p.video %}
-                    <div class="no-photo-msg">
-                        <i class="fas fa-play-circle"></i>
-                        VÍDEO DISPONIBLE
-                    </div>
-                {% else %}
-                    <div class="no-photo-msg">
-                        <i class="fas fa-image"></i>
-                        SIN PREVIA
-                    </div>
                 {% endif %}
             </div>
-
-            <div class="content">
-                <h3 style="margin:0; font-size: 1.3rem;">{{ p.nombre }}</h3>
-                <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
-                
-                <div style="display:flex; align-items:center; gap:8px; color:#64748b; font-size: 0.9rem; margin-bottom: 5px;">
-                    <i class="fas fa-store"></i> {{ p.vendedor.nombre if p.vendedor else 'Vendedor' }}
-                </div>
-
-                <div class="actions">
-                    <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-view">
-                        <i class="fas fa-comment-dots"></i> Comentarios y Video
-                    </a>
-
-                    <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-perfil-vendedor">
-                        <i class="fas fa-user-circle"></i> Ver Perfil Vendedor
-                    </a>
-                </div>
+            <div class="info">
+                <h2 style="margin:0">{{ p.nombre }}</h2>
+                <div style="color:#2563eb; font-size:1.5rem; font-weight:800;">${{ "{:,.0f}".format(p.precio) }}</div>
+                <p>{{ p.descripcion }}</p>
             </div>
-        </div>
-        {% else %}
-        <div class="empty">
-            <i class="fas fa-rocket" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 20px;"></i>
-            <h2>¡Sé el primero en vender en Sabanalarga!</h2>
-            <p>Aún no hay anuncios. Regístrate y sube el tuyo ahora mismo.</p>
-            <a href="{{ url_for('registro') }}" class="btn btn-sell" style="display:inline-flex; margin-top:20px;">Empezar Ahora</a>
+            <div class="comment-section">
+                <strong>Comentarios:</strong>
+                {% for c in p.comentarios %}
+                <div class="comment">
+                    <b>{{ c.autor.nombre if c.autor else 'Usuario' }}:</b> {{ c.contenido }}
+                </div>
+                {% endfor %}
+
+                {% if session.get('user_id') %}
+                <form action="/comentar/{{ p.id }}" method="POST" style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="text" name="comentario" placeholder="Escribir..." style="flex:1; border-radius:8px; border:1px solid #ddd; padding:8px;" required>
+                    <button type="submit" style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:8px;">Enviar</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
