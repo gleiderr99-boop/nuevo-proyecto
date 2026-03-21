@@ -3,70 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabanalarga Market | Apoya lo Local</title>
+    <title>Sabanalarga Market</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; --white: #ffffff; --perfil: #6366f1; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; color: #1e293b; }
+        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; }
         
         nav { 
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px); 
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); 
             padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 30px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1000; 
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
-        
-        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.7rem; letter-spacing: -1.5px; }
+
+        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.6rem; }
         .logo span { color: var(--accent); }
 
-        .btn { padding: 10px 22px; border-radius: 14px; text-decoration: none; font-weight: 700; transition: 0.4s; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .btn-panel { background: var(--primary); color: white; }
-        .btn-login { color: #475569; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: 0.3s; }
+        .btn-reg { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+        .btn-log { background: #e0e7ff; color: var(--primary); }
 
-        .hero { text-align: center; padding: 60px 20px; background: radial-gradient(circle at top, #ffffff, #f8fafc); }
-        .hero h1 { font-size: 3rem; margin: 0; letter-spacing: -2px; line-height: 1.1; }
+        .hero { text-align: center; padding: 80px 5%; background: linear-gradient(to bottom, #fff, var(--bg)); }
+        .hero h1 { font-size: 3.2rem; letter-spacing: -2px; line-height: 1; margin: 0; }
         
-        .search-box { 
-            max-width: 600px; margin: 30px auto; display: flex; background: white; 
-            padding: 8px; border-radius: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.06); border: 1px solid #edf2f7;
-        }
-        .search-box input { flex: 1; border: none; padding: 12px 20px; outline: none; font-size: 1rem; }
-        .search-box button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
+        .search-container { max-width: 600px; margin: 30px auto; display: flex; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+        .search-container input { flex: 1; border: none; padding: 10px 20px; outline: none; font-size: 1rem; }
+        .search-container button { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; padding: 40px 8%; }
-        .card { background: white; border-radius: 30px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.02); transition: 0.5s; border: 1px solid rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; padding: 20px 8%; }
+        .card { background: white; border-radius: 25px; overflow: hidden; transition: 0.4s; border: 1px solid #eee; }
         .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         
-        .img-container { width: 100%; height: 250px; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .img-container img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .badge { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; color: var(--primary); z-index: 2; }
+        .img-holder { width: 100%; height: 250px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
+        .img-holder img { width: 100%; height: 100%; object-fit: cover; }
+        .badge { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; color: var(--primary); }
 
-        .content { padding: 25px; }
-        .price { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        
-        .actions { display: flex; flex-direction: column; gap: 10px; }
-        .btn-view { background: #f1f5f9; color: var(--primary); text-decoration: none; text-align: center; padding: 12px; border-radius: 15px; font-weight: 800; transition: 0.3s; }
-        .btn-view:hover { background: var(--primary); color: white; }
-        .btn-perfil { background: #eff6ff; color: var(--perfil); text-decoration: none; text-align: center; padding: 12px; border-radius: 15px; font-weight: 800; border: 1px solid #dbeafe; }
+        .info { padding: 25px; }
+        .price { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-bottom: 15px; }
+        .btn-view { display: block; background: #f1f5f9; color: var(--primary); text-align: center; padding: 12px; border-radius: 15px; text-decoration: none; font-weight: 800; }
     </style>
 </head>
 <body>
     <nav>
         <a href="/" class="logo">SABANALARGA<span>.</span>MKT</a>
-        <div style="display: flex; gap: 10px;">
+        <div class="btn-group">
             {% if session.get('user_id') %}
-                <a href="/gleider_admin" class="btn btn-panel">Mi Panel</a>
+                <a href="/gleider_admin" class="btn btn-log">Mi Panel</a>
             {% else %}
-                <a href="/login" class="btn btn-login">Entrar</a>
+                <a href="/login" class="btn btn-log">Entrar</a>
+                <a href="/registro" class="btn btn-reg">Registrarme</a>
             {% endif %}
         </div>
     </nav>
 
     <div class="hero">
-        <h1>Apoya lo local, <br><span style="color:var(--primary)">Sabanalarga Crece.</span></h1>
-        <form action="/" class="search-box">
-            <input type="text" name="q" placeholder="¿Qué buscas hoy?">
+        <h1>Lo mejor de nuestra tierra <br><span style="color:var(--primary)">en un solo lugar.</span></h1>
+        <form action="/" class="search-container">
+            <input type="text" name="q" placeholder="¿Qué buscas hoy en Sabanalarga?">
             <button type="submit">Buscar</button>
         </form>
     </div>
@@ -74,7 +68,7 @@
     <div class="grid">
         {% for p in productos %}
         <div class="card">
-            <div class="img-container">
+            <div class="img-holder">
                 <div class="badge">{{ p.categoria | upper }}</div>
                 {% if p.imagen %}
                     <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
@@ -82,13 +76,10 @@
                     <div style="color:white; text-align:center;"><i class="fas fa-play-circle fa-3x"></i><p>VIDEO DISPONIBLE</p></div>
                 {% endif %}
             </div>
-            <div class="content">
+            <div class="info">
                 <h3 style="margin:0">{{ p.nombre }}</h3>
                 <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
-                <div class="actions">
-                    <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-view"><i class="fas fa-comment-dots"></i> Comentarios y Video</a>
-                    <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-perfil"><i class="fas fa-user-circle"></i> Perfil Vendedor</a>
-                </div>
+                <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-view">Ver Detalles</a>
             </div>
         </div>
         {% endfor %}
