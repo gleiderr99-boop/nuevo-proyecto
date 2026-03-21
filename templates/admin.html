@@ -2,106 +2,55 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Panel | Sabanalarga Market</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Mi Panel | Sabanalarga MKT</title>
     <style>
-        :root { --primary: #2563eb; --dark: #1e293b; --bg: #f1f5f9; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; display: flex; }
-        
-        .sidebar { width: 260px; background: var(--dark); height: 100vh; color: white; padding: 25px; position: fixed; }
-        .sidebar h2 { color: var(--primary); margin-bottom: 30px; }
-        .sidebar a { display: block; color: #94a3b8; padding: 12px; text-decoration: none; border-radius: 10px; margin-bottom: 10px; }
-        .sidebar a:hover { background: var(--primary); color: white; }
-
-        .content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        
-        /* Mensajes */
-        .chat-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; text-decoration: none; color: inherit; }
-        .chat-item:hover { background: #f8fafc; }
-        .dot { height: 10px; width: 10px; background: #ef4444; border-radius: 50%; }
-
-        /* Formulario */
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar span, .sidebar h2 { display: none; }
-            .content { margin-left: 90px; width: calc(100% - 90px); }
-        }
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; margin: 0; min-height: 100vh; }
+        .sidebar { width: 300px; background: white; padding: 20px; border-right: 1px solid #ddd; }
+        .main { flex: 1; padding: 40px; }
+        .form-group { margin-bottom: 15px; }
+        input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .card-msg { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #2563eb; text-decoration: none; display: block; color: #333; }
+        .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 700; }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
-        <h2>MARKET</h2>
-        <a href="/"><i class="fas fa-home"></i> <span>Tienda</span></a>
-        <a href="/gleider_admin"><i class="fas fa-comments"></i> <span>Mis Chats</span></a>
-        <a href="/logout" style="color:#ff6b6b; margin-top: 50px;"><i class="fas fa-sign-out-alt"></i> <span>Salir</span></a>
+        <h2>Mis Chats</h2>
+        {% for m in mensajes %}
+            <a href="/chat/{{ m.emisor_id if m.emisor_id != session['user_id'] else m.receptor_id }}" class="card-msg">
+                <strong>{{ m.emisor.nombre if m.emisor_id != session['user_id'] else m.receptor.nombre }}</strong>
+                <p style="margin: 5px 0; font-size: 0.8rem; overflow: hidden; white-space: nowrap;">{{ m.contenido }}</p>
+            </a>
+        {% endfor %}
+        <hr>
+        <a href="/logout" style="color: red;">Cerrar Sesión</a>
     </div>
 
-    <div class="content">
-        <header>
-            <h1>Hola, {{ user.nombre }} 👋</h1>
-            <p style="color: #64748b;">Panel de control de tu cuenta.</p>
-        </header>
-
-        <div class="card">
-            <h3><i class="fas fa-envelope"></i> Conversaciones Recientes</h3>
-            {% if mensajes %}
-                {% for m in mensajes %}
-                    {% set otro = m.emisor if m.emisor_id != user.id else m.receptor %}
-                    <a href="/chat/{{ otro.id }}" class="chat-item">
-                        <div>
-                            <strong>{{ otro.nombre }}</strong>
-                            <p style="margin:0; font-size:0.8rem; color:#64748b;">{{ m.contenido[:40] }}...</p>
-                        </div>
-                        {% if not m.leido and m.receptor_id == user.id %}
-                            <div class="dot"></div>
-                        {% endif %}
-                    </a>
-                {% endfor %}
-            {% else %}
-                <p style="color: #94a3b8; text-align: center;">No tienes mensajes todavía.</p>
-            {% endif %}
-        </div>
-
+    <div class="main">
+        <h1>¡Hola, {{ user.nombre }}!</h1>
+        
         {% if user.telefono != "Cliente" %}
-        <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> Publicar Producto Nuevo</h3>
+        <div style="background: white; padding: 25px; border-radius: 15px; max-width: 500px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h3>Subir nuevo producto / anuncio</h3>
             <form method="POST" enctype="multipart/form-data">
-                <input type="text" name="nombre" placeholder="Nombre del producto" required>
-                <input type="number" name="precio" placeholder="Precio en COP" required>
-                <select name="categoria">
-                    <option value="Ropa">Ropa</option>
-                    <option value="Calzado">Calzado</option>
-                    <option value="Comida">Comida / Emprendimiento</option>
-                    <option value="Accesorios">Accesorios</option>
-                </select>
-                <textarea name="descripcion" placeholder="¿De qué trata tu producto?" rows="3" required></textarea>
-                <input type="file" name="foto" accept="image/*" required>
-                <button type="submit">Subir a la Tienda</button>
+                <div class="form-group"><label>Nombre</label><input type="text" name="nombre" required></div>
+                <div class="form-group"><label>Precio</label><input type="number" name="precio" required></div>
+                <div class="form-group"><label>Categoría</label>
+                    <select name="categoria">
+                        <option>Comida</option><option>Moda</option><option>Servicios</option><option>Otros</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Descripción</label><textarea name="descripcion" rows="3"></textarea></div>
+                <div class="form-group"><label>Foto (Obligatoria)</label><input type="file" name="foto" accept="image/*" required></div>
+                <div class="form-group"><label>Video Promocional (Opcional)</label><input type="file" name="video" accept="video/*"></div>
+                <button type="submit" class="btn">Publicar ahora</button>
             </form>
         </div>
-
-        <div class="card">
-            <h3><i class="fas fa-boxes"></i> Tu Inventario</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                {% for p in productos %}
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 10px;"><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" width="50" style="border-radius: 5px;"></td>
-                    <td>{{ p.nombre }}</td>
-                    <td>${{ "{:,.0f}".format(p.precio) }}</td>
-                    <td><a href="/eliminar/{{ p.id }}" style="color:red; text-decoration:none;"><i class="fas fa-trash"></i></a></td>
-                </tr>
-                {% endfor %}
-            </table>
+        {% else %}
+        <div style="background: #e0e7ff; padding: 20px; border-radius: 10px;">
+            <p><strong>Nota:</strong> Como eres cuenta de Cliente, puedes ver tus chats pero no subir productos. ¡Para vender, regístrate como vendedor!</p>
         </div>
         {% endif %}
-
     </div>
-
 </body>
 </html>
