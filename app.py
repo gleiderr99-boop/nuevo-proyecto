@@ -6,11 +6,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-
-# CAMBIO DE NOMBRE DE BD PARA DESBLOQUEAR RENDER
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sabanalarga_v3.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sabanalarga_v4.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'llave_maestra_99'
+app.secret_key = 'token_ultra_seguro_sabanalarga'
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -18,7 +16,6 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 db = SQLAlchemy(app)
 
-# MODELOS
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
@@ -50,23 +47,18 @@ class Comentario(db.Model):
 with app.app_context():
     db.create_all()
 
-# RUTAS
 @app.route('/')
 def inicio():
-    try:
-        q = request.args.get('q')
-        productos = Producto.query.filter(Producto.nombre.contains(q)).all() if q else Producto.query.all()
-        return render_template('index.html', productos=productos)
-    except:
-        return "Error en Inicio. Por favor, recarga la página."
+    q = request.args.get('q')
+    productos = Producto.query.filter(Producto.nombre.contains(q)).all() if q else Producto.query.all()
+    return render_template('index.html', productos=productos)
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
         correo = request.form['correo'].lower().strip()
-        if User.query.filter_by(correo=correo).first(): return "Correo ya registrado"
-        nuevo = User(nombre=request.form['nombre'], correo=correo, 
-                     telefono=request.form.get('telefono', 'Cliente'),
+        if User.query.filter_by(correo=correo).first(): return "Ya existe este correo."
+        nuevo = User(nombre=request.form['nombre'], correo=correo, telefono=request.form.get('telefono'),
                      password=generate_password_hash(request.form['pass'], method='pbkdf2:sha256'),
                      es_admin=(correo == 'gleiderr99@gmail.com'))
         db.session.add(nuevo); db.session.commit()
@@ -81,6 +73,12 @@ def login():
             session.update({'user_id': u.id, 'user_name': u.nombre, 'es_admin': u.es_admin})
             return redirect(url_for('gleider_admin'))
     return render_template('login.html')
+
+@app.route('/perfil/<int:user_id>')
+def perfil(user_id):
+    usuario = User.query.get_or_404(user_id)
+    productos = Producto.query.filter_by(user_id=user_id).all()
+    return render_template('perfil.html', usuario=usuario, productos=productos)
 
 @app.route('/gleider_admin', methods=['GET', 'POST'])
 def gleider_admin():
@@ -100,20 +98,10 @@ def gleider_admin():
     productos = Producto.query.filter_by(user_id=user.id).all()
     return render_template('admin.html', user=user, productos=productos)
 
-@app.route('/perfil/<int:user_id>')
-def perfil(user_id):
-    try:
-        usuario = User.query.get_or_404(user_id)
-        productos = Producto.query.filter_by(user_id=user_id).all()
-        return render_template('perfil.html', usuario=usuario, productos=productos)
-    except Exception as e:
-        return f"Error en Perfil: {str(e)}"
-
 @app.route('/comentar/<int:p_id>', methods=['POST'])
 def comentar(p_id):
     if 'user_id' not in session: return redirect(url_for('login'))
-    nuevo = Comentario(contenido=request.form.get('comentario'), 
-                       user_id=session['user_id'], producto_id=p_id)
+    nuevo = Comentario(contenido=request.form.get('comentario'), user_id=session['user_id'], producto_id=p_id)
     db.session.add(nuevo); db.session.commit()
     return redirect(request.referrer)
 
@@ -122,5 +110,4 @@ def logout():
     session.clear(); return redirect(url_for('inicio'))
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
