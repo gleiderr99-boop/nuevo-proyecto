@@ -3,83 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabanalarga Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Sabanalarga Social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; }
+        :root { --fb-bg: #f0f2f5; --fb-blue: #1877f2; --white: #ffffff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--fb-bg); margin: 0; color: #1c1e21; }
         
-        nav { 
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); 
-            padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; 
-            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
+        nav { background: var(--white); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .logo { color: var(--fb-blue); font-weight: 800; font-size: 1.8rem; text-decoration: none; letter-spacing: -1px; }
 
-        .logo { font-weight: 800; color: var(--primary); text-decoration: none; font-size: 1.6rem; }
-        .logo span { color: var(--accent); }
-
-        .btn-group { display: flex; gap: 10px; }
-        .btn { padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: 0.3s; }
-        .btn-reg { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
-        .btn-log { background: #e0e7ff; color: var(--primary); }
-
-        .hero { text-align: center; padding: 80px 5%; background: linear-gradient(to bottom, #fff, var(--bg)); }
-        .hero h1 { font-size: 3.2rem; letter-spacing: -2px; line-height: 1; margin: 0; }
+        .main-container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
         
-        .search-container { max-width: 600px; margin: 30px auto; display: flex; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
-        .search-container input { flex: 1; border: none; padding: 10px 20px; outline: none; font-size: 1rem; }
-        .search-container button { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; }
+        /* Caja de Publicar */
+        .publish-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .publish-top { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+        .avatar { width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555; overflow: hidden;}
+        .fake-input { flex: 1; background: #f0f2f5; padding: 10px 15px; border-radius: 20px; color: #65676b; cursor: pointer; text-decoration: none; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; padding: 20px 8%; }
-        .card { background: white; border-radius: 25px; overflow: hidden; transition: 0.4s; border: 1px solid #eee; }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        /* Tarjeta de Post */
+        .post-card { background: var(--white); border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; }
+        .post-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+        .post-author { font-weight: 700; text-decoration: none; color: #1c1e21; }
+        .post-author:hover { text-decoration: underline; }
+        .post-meta { font-size: 0.8rem; color: #65676b; }
         
-        .img-holder { width: 100%; height: 250px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
-        .img-holder img { width: 100%; height: 100%; object-fit: cover; }
-        .badge { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; color: var(--primary); }
+        .post-body { padding: 0 0 12px 0; }
+        .post-text { padding: 0 16px 12px; font-size: 1rem; }
+        .post-price { color: var(--fb-blue); font-weight: 800; font-size: 1.2rem; }
+        .post-media { width: 100%; background: #000; display: block; }
 
-        .info { padding: 25px; }
-        .price { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-bottom: 15px; }
-        .btn-view { display: block; background: #f1f5f9; color: var(--primary); text-align: center; padding: 12px; border-radius: 15px; text-decoration: none; font-weight: 800; }
+        .post-actions { display: flex; border-top: 1px solid #f0f2f5; padding: 4px 0; justify-content: space-around; }
+        .action-btn { flex: 1; text-align: center; padding: 8px; color: #65676b; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .action-btn:hover { background: #f2f2f2; border-radius: 4px; }
     </style>
 </head>
 <body>
     <nav>
-        <a href="/" class="logo">SABANALARGA<span>.</span>MKT</a>
-        <div class="btn-group">
+        <a href="/" class="logo">facebook <span style="color:#65676b; font-size:1rem; font-weight:400;">(Sabanalarga)</span></a>
+        <div>
             {% if session.get('user_id') %}
-                <a href="/gleider_admin" class="btn btn-log">Mi Panel</a>
+                <a href="/gleider_admin" style="text-decoration:none; font-weight:700; color:var(--fb-blue);">Vender algo</a>
             {% else %}
-                <a href="/login" class="btn btn-log">Entrar</a>
-                <a href="/registro" class="btn btn-reg">Registrarme</a>
+                <a href="/login" style="text-decoration:none; font-weight:700;">Entrar</a>
             {% endif %}
         </div>
     </nav>
 
-    <div class="hero">
-        <h1>Lo mejor de nuestra tierra <br><span style="color:var(--primary)">en un solo lugar.</span></h1>
-        <form action="/" class="search-container">
-            <input type="text" name="q" placeholder="¿Qué buscas hoy en Sabanalarga?">
-            <button type="submit">Buscar</button>
-        </form>
-    </div>
+    <div class="main-container">
+        <div class="publish-card">
+            <div class="publish-top">
+                <div class="avatar" style="background:var(--fb-blue); color:white;">{{ session['user_name'][0] if session.get('user_name') else '?' }}</div>
+                <a href="/gleider_admin" class="fake-input">¿Qué quieres vender hoy, {{ session['user_name'] if session.get('user_name') else 'visitante' }}?</a>
+            </div>
+            <div style="display:flex; justify-content:space-around; border-top:1px solid #eee; pt:10px; padding-top:10px;">
+                <span style="color:#f3425f; font-size:0.9rem; font-weight:600;"><i class="fas fa-video"></i> Video</span>
+                <span style="color:#45bd62; font-size:0.9rem; font-weight:600;"><i class="fas fa-images"></i> Foto/video</span>
+            </div>
+        </div>
 
-    <div class="grid">
         {% for p in productos %}
-        <div class="card">
-            <div class="img-holder">
-                <div class="badge">{{ p.categoria | upper }}</div>
-                {% if p.imagen %}
-                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-                {% else %}
-                    <div style="color:white; text-align:center;"><i class="fas fa-play-circle fa-3x"></i><p>VIDEO DISPONIBLE</p></div>
+        <div class="post-card">
+            <div class="post-header">
+                <div class="avatar" style="background:#e4e6eb;">{{ p.vendedor.nombre[0] if p.vendedor else 'V' }}</div>
+                <div>
+                    <a href="/perfil/{{ p.user_id }}" class="post-author">{{ p.vendedor.nombre if p.vendedor else 'Usuario de Sabanalarga' }}</a>
+                    <div class="post-meta">Publicado en {{ p.categoria }} • <i class="fas fa-globe-americas"></i></div>
+                </div>
+            </div>
+            <div class="post-body">
+                <div class="post-text">
+                    <div class="post-price">${{ "{:,.0f}".format(p.precio) }}</div>
+                    {{ p.descripcion }}
+                </div>
+                {% if p.video %}
+                    <video class="post-media" controls><source src="{{ url_for('static', filename='uploads/' + p.video) }}"></video>
+                {% elif p.imagen %}
+                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" class="post-media">
                 {% endif %}
             </div>
-            <div class="info">
-                <h3 style="margin:0">{{ p.nombre }}</h3>
-                <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
-                <a href="{{ url_for('perfil', user_id=p.user_id) }}" class="btn-view">Ver Detalles</a>
+            <div class="post-actions">
+                <a href="#" class="action-btn"><i class="far fa-thumbs-up"></i> Me gusta</a>
+                <a href="/perfil/{{ p.user_id }}" class="action-btn"><i class="far fa-comment"></i> Comentar</a>
+                <a href="https://wa.me/{{ p.vendedor.telefono if p.vendedor else '' }}" class="action-btn" style="color:#25d366;"><i class="fab fa-whatsapp"></i> Comprar</a>
             </div>
         </div>
         {% endfor %}
