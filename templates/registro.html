@@ -3,77 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro | Sabanalarga Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Únete a Sabanalarga Social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --accent: #f59e0b; --bg: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        
-        .reg-card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        .logo-reg { font-weight: 800; color: var(--primary); font-size: 1.8rem; margin-bottom: 20px; display: block; text-decoration: none; }
-        
-        .type-selector { display: flex; gap: 10px; margin: 20px 0; }
-        .type-option { flex: 1; border: 2px solid #f1f5f9; padding: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; position: relative; }
-        .type-option input { position: absolute; opacity: 0; }
-        .type-option i { font-size: 1.5rem; display: block; margin-bottom: 5px; color: #94a3b8; }
-        
-        /* Cuando se selecciona una opción */
-        .type-option:has(input:checked) { border-color: var(--primary); background: #eff6ff; }
-        .type-option:has(input:checked) i { color: var(--primary); }
-
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #e2e8f0; box-sizing: border-box; font-family: inherit; }
-        .btn-reg { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        .btn-reg:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .reg-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { color: #0866ff; font-weight: 800; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .btn-reg { width: 100%; padding: 12px; background: #42b72a; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+        .btn-reg:hover { background: #36a420; }
+        a { color: #0866ff; text-decoration: none; font-size: 0.9rem; display: block; margin-top: 15px; }
     </style>
 </head>
 <body>
-
-<div class="reg-card">
-    <a href="/" class="logo-reg">SABANALARGA<span>.</span>MKT</a>
-    <h2 style="margin:0">Crea tu cuenta</h2>
-    <p style="color: #64748b;">Únete a la comunidad de comercio local</p>
-
-    <form method="POST">
-        <div class="type-selector">
-            <label class="type-option">
-                <input type="radio" name="tipo_usuario" value="cliente" checked onclick="toggleTel(false)">
-                <i class="fas fa-shopping-bag"></i>
-                <strong>Soy Cliente</strong>
-            </label>
-            <label class="type-option">
-                <input type="radio" name="tipo_usuario" value="vendedor" onclick="toggleTel(true)">
-                <i class="fas fa-store"></i>
-                <strong>Soy Vendedor</strong>
-            </label>
-        </div>
-
-        <input type="text" name="nombre" placeholder="Nombre completo" required>
-        <input type="email" name="correo" placeholder="Correo electrónico" required>
-        <input type="password" name="pass" placeholder="Contraseña segura" required>
-        
-        <div id="div-tel" style="display: none;">
-            <input type="text" name="telefono" placeholder="Número de WhatsApp para ventas">
-        </div>
-
-        <button type="submit" class="btn-reg">COMENZAR AHORA</button>
-    </form>
-
-    <p style="margin-top: 20px; font-size: 0.9rem;">
-        ¿Ya tienes cuenta? <a href="/login" style="color: var(--primary); font-weight: 700; text-decoration: none;">Entrar aquí</a>
-    </p>
-</div>
-
-<script>
-    function toggleTel(show) {
-        document.getElementById('div-tel').style.display = show ? 'block' : 'none';
-        if(show) {
-            document.getElementsByName('telefono')[0].setAttribute('required', 'required');
-        } else {
-            document.getElementsByName('telefono')[0].removeAttribute('required');
-        }
-    }
-</script>
-
+    <div class="reg-card">
+        <h1>Crear cuenta</h1>
+        <p style="color: #65676b;">Es rápido y fácil.</p>
+        <form action="/registro" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre completo" required>
+            <input type="email" name="correo" placeholder="Correo electrónico" required>
+            <input type="text" name="telefono" placeholder="Número de celular (WhatsApp)" required>
+            <input type="password" name="pass" placeholder="Contraseña nueva" required>
+            <button type="submit" class="btn-reg">Registrarte</button>
+        </form>
+        <a href="/login">¿Ya tienes una cuenta?</a>
+    </div>
 </body>
 </html>
