@@ -3,58 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles | Sabanalarga Market</title>
+    <title>Perfil de {{ usuario.nombre }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .post { background: white; border-radius: 30px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-        .media { width: 100%; background: #000; min-height: 400px; display: flex; align-items: center; justify-content: center; }
-        video, img { width: 100%; max-height: 600px; object-fit: contain; }
-        .content { padding: 30px; }
-        .price { font-size: 2rem; font-weight: 800; color: #2563eb; }
-        .comment-box { background: #f8fafc; padding: 25px; border-top: 1px solid #eee; }
-        .comment { background: white; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
-        .btn-back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #2563eb; font-weight: 700; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; margin: 0; }
+        .header-profile { background: white; padding-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .cover { width: 100%; height: 250px; background: linear-gradient(to bottom, #1877f2, #0056b3); }
+        .profile-info { max-width: 800px; margin: -50px auto 0; padding: 0 20px; display: flex; align-items: flex-end; gap: 20px; }
+        .profile-pic { width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; background: #ccc; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: white; background: #1877f2; }
+        .user-details h1 { margin: 0; font-size: 2rem; }
+        .user-details p { margin: 5px 0; color: #65676b; font-weight: 600; }
+        
+        .muro { max-width: 600px; margin: 20px auto; padding: 20px; }
+        .post { background: white; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; padding-bottom:15px; }
+        .comment-section { background: #f0f2f5; margin: 10px 15px; padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="/" class="btn-back">← Volver al inicio</a>
-        
-        <div style="text-align:center; margin-bottom:30px;">
-            <h1 style="margin:0">{{ usuario.nombre }}</h1>
-            <p style="color:#64748b;">Vendedor Oficial</p>
+    <div class="header-profile">
+        <div class="cover"></div>
+        <div class="profile-info">
+            <div class="profile-pic">{{ usuario.nombre[0] | upper }}</div>
+            <div class="user-details">
+                <h1>{{ usuario.nombre }}</h1>
+                <p><i class="fas fa-phone"></i> {{ usuario.telefono if usuario.telefono else 'Sin teléfono' }}</p>
+            </div>
         </div>
+        <div style="max-width:800px; margin: 20px auto; border-top:1px solid #ddd; padding-top:10px;">
+            <a href="/" style="text-decoration:none; color:#1877f2; font-weight:700; margin-left:20px;">Publicaciones</a>
+        </div>
+    </div>
 
+    <div class="muro">
+        <h3 style="color:#65676b;">Publicaciones recientes</h3>
         {% for p in productos %}
         <div class="post">
-            <div class="media">
-                {% if p.video %}
-                    <video controls autoplay muted loop>
-                        <source src="{{ url_for('static', filename='uploads/' + p.video) }}" type="video/mp4">
-                    </video>
-                {% elif p.imagen %}
-                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-                {% endif %}
-            </div>
-            <div class="content">
-                <div class="price">${{ "{:,.0f}".format(p.precio) }}</div>
-                <h2>{{ p.nombre }}</h2>
-                <p style="color:#475569; line-height:1.6;">{{ p.descripcion }}</p>
-            </div>
-            <div class="comment-box">
-                <h4 style="margin-top:0;">Comentarios</h4>
+            <div style="padding:15px; font-weight:800; color:#1877f2;">{{ p.nombre }} - ${{ "{:,.0f}".format(p.precio) }}</div>
+            {% if p.video %}
+                <video controls style="width:100%;"><source src="{{ url_for('static', filename='uploads/' + p.video) }}"></video>
+            {% elif p.imagen %}
+                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" style="width:100%;">
+            {% endif %}
+            
+            <div style="padding:15px;">{{ p.descripcion }}</div>
+
+            <div class="comment-section">
+                <strong>Comentarios:</strong>
                 {% for c in p.comentarios %}
-                <div class="comment">
+                <div style="font-size:0.9rem; margin-top:5px;">
                     <b>{{ c.autor.nombre if c.autor else 'Usuario' }}:</b> {{ c.contenido }}
                 </div>
                 {% endfor %}
+                
                 {% if session.get('user_id') %}
-                <form action="/comentar/{{ p.id }}" method="POST" style="display:flex; gap:10px; margin-top:20px;">
-                    <input type="text" name="comentario" placeholder="Escribe algo..." style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd;" required>
-                    <button type="submit" style="background:#2563eb; color:white; border:none; padding:12px 20px; border-radius:12px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+                <form action="/comentar/{{ p.id }}" method="POST" style="margin-top:10px; display:flex; gap:5px;">
+                    <input type="text" name="comentario" placeholder="Escribe un comentario..." style="flex:1; border-radius:15px; border:1px solid #ddd; padding:5px 10px;" required>
+                    <button type="submit" style="border:none; background:none; color:#1877f2;"><i class="fas fa-paper-plane"></i></button>
                 </form>
                 {% endif %}
             </div>
