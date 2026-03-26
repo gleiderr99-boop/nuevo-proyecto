@@ -1,26 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Gleider Shop - Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Sabanalarga Social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 350px; text-align: center; }
-        h2 { color: #333; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #0056b3; }
-        .back-link { display: block; margin-top: 15px; color: #666; text-decoration: none; font-size: 14px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { display: flex; max-width: 900px; align-items: center; gap: 50px; padding: 20px; }
+        .brand-section { max-width: 400px; }
+        .brand-section h1 { color: #0866ff; font-size: 3.5rem; margin: 0; letter-spacing: -2px; }
+        .brand-section p { font-size: 1.5rem; line-height: 1.2; color: #1c1e21; }
+        
+        .login-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .btn-login { width: 100%; padding: 12px; background: #0866ff; color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 1.2rem; cursor: pointer; }
+        .hr { border-top: 1px solid #dadde1; margin: 20px 0; }
+        .btn-new { background: #42b72a; padding: 12px; color: white; text-decoration: none; border-radius: 6px; font-weight: 700; display: inline-block; }
+        
+        @media (max-width: 768px) {
+            .login-container { flex-direction: column; text-align: center; gap: 20px; }
+            .brand-section h1 { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h2>Ingresar</h2>
-        <form method="POST">
-            <input type="email" name="correo" placeholder="Correo Electrónico" required>
-            <input type="password" name="pass" placeholder="Contraseña" required>
-            <button type="submit">Entrar</button>
-        </form>
-        <a href="/" class="back-link">← Volver al inicio</a>
+    <div class="login-container">
+        <div class="brand-section">
+            <h1>sabanalarga</h1>
+            <p>Conecta con los negocios y personas de tu tierra en nuestra red social.</p>
+        </div>
+        <div class="login-card">
+            <form action="/login" method="POST">
+                <input type="email" name="correo" placeholder="Correo electrónico" required>
+                <input type="password" name="pass" placeholder="Contraseña" required>
+                <button type="submit" class="btn-login">Iniciar sesión</button>
+            </form>
+            <a href="#" style="color:#0866ff; font-size:0.8rem; display:block; margin:15px 0; text-decoration:none;">¿Olvidaste tu contraseña?</a>
+            <div class="hr"></div>
+            <a href="/registro" class="btn-new">Crear cuenta nueva</a>
+        </div>
     </div>
 </body>
 </html>
